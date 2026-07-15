@@ -313,4 +313,25 @@ function initTelemetryEvents() {
     telemetryPanel.classList.remove('active');
     telemetryIframe.src = '';
   });
+
+  // Bloquear zoom con Ctrl+scroll (rueda del mouse) sobre el iframe
+  const iframeBody = document.querySelector('.iframe-body');
+  iframeBody.addEventListener('wheel', (e) => {
+    if (e.ctrlKey) {
+      e.preventDefault(); // Evita el zoom del navegador con Ctrl+rueda
+    }
+  }, { passive: false });
+
+  // Bloquear gestos táctiles de zoom (pinch) sobre el iframe
+  iframeBody.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 1) {
+      e.preventDefault(); // Bloquea pinch-to-zoom con dos dedos
+    }
+  }, { passive: false });
+
+  iframeBody.addEventListener('touchmove', (e) => {
+    if (e.touches.length > 1) {
+      e.preventDefault(); // Mantiene bloqueado el gesto durante el movimiento
+    }
+  }, { passive: false });
 }
