@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electroductos | Infraestructura Eléctrica y Telemedición</title>
+  <meta name="description" content="Soluciones avanzadas en componentes eléctricos, pilares, subestaciones y sistemas inteligentes de telemedición.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Decorative Glowing Orbs -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <!-- Header Navigation -->
+  <header id="site-header">
+    <div class="nav-container">
+      <a href="#inicio" class="logo" id="logo-link">
+        <div class="logo-icon">
+          <i data-lucide="zap"></i>
+        </div>
+        <div class="logo-text">
+          ELECTRO<span>DUCTOS</span>
+        </div>
+      </a>
+      
+      <button class="menu-toggle" id="mobile-menu-btn" aria-label="Abrir menú">
+        <i data-lucide="menu"></i>
+      </button>
+
+      <ul class="nav-menu" id="nav-links">
+        <li class="nav-item active" data-target="all"><a href="#catalogo">Catálogo</a></li>
+        <li class="nav-item" data-target="componentes"><a href="#catalogo">Componentes</a></li>
+        <li class="nav-item" data-target="pilares"><a href="#catalogo">Pilares</a></li>
+        <li class="nav-item" data-target="subestaciones"><a href="#catalogo">Subestaciones</a></li>
+        <li class="nav-item" data-target="telemedicion"><a href="#telemedicion">Telemedición</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="inicio">
+    <div class="hero-content">
+      <div class="hero-tag">
+        <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i> Tecnologías Eléctricas de Vanguardia
+      </div>
+      <h1>Sistemas de Infraestructura y <span>Telemedición Inteligente</span></h1>
+      <p class="hero-description">
+        Proveemos soluciones robustas para redes eléctricas de distribución y transmisión, combinando ingeniería avanzada y sistemas de telemedición en tiempo real.
+      </p>
+      <div class="hero-cta">
+        <a href="#catalogo" class="btn btn-primary" id="hero-btn-catalog">
+          Explorar Productos <i data-lucide="arrow-right"></i>
+        </a>
+        <a href="#telemedicion" class="btn btn-secondary" id="hero-btn-telemetry">
+          Ver Telemedición <i data-lucide="activity"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Area -->
+  <main>
+    <!-- Catalog Section -->
+    <section id="catalogo">
+      <h2 class="section-title" id="catalog-heading">Catálogo de Productos</h2>
+      <p class="section-subtitle">Filtre por categoría para ver nuestra gama de soluciones eléctricas certificadas.</p>
+
+      <!-- Category Tabs Selector -->
+      <div class="catalog-tabs" id="catalog-category-tabs">
+        <button class="tab-btn active" data-category="all">
+          <i data-lucide="grid"></i> Todos
+        </button>
+        <button class="tab-btn" data-category="componentes">
+          <i data-lucide="cpu"></i> Componentes Eléctricos
+        </button>
+        <button class="tab-btn" data-category="pilares">
+          <i data-lucide="columns"></i> Pilares
+        </button>
+        <button class="tab-btn" data-category="subestaciones">
+          <i data-lucide="box"></i> Subestaciones
+        </button>
+        <button class="tab-btn" data-category="telemedicion">
+          <i data-lucide="activity"></i> Telemedición
+        </button>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="catalog-grid" id="products-display-grid">
+        <!-- Dynamically loaded via Javascript -->
+      </div>
+    </section>
+
+    <!-- Telemedición Section (Cooperatives & Embedded Panel) -->
+    <section id="telemedicion" class="coop-section">
+      <h2 class="section-title">Servicio de Telemedición</h2>
+      <p class="section-subtitle">Seleccione una cooperativa para visualizar el panel de control y mediciones en tiempo real.</p>
+      
+      <!-- Cooperatives Cards Grid -->
+      <div class="coop-grid" id="cooperatives-display-grid">
+        <!-- Cooperativa A -->
+        <div class="coop-card" data-coop-id="coop-a">
+          <div class="coop-icon">
+            <i data-lucide="building-2"></i>
+          </div>
+          <h3 class="coop-name">Cooperativa A</h3>
+          <p class="coop-desc">Monitoreo de red eléctrica y consumo inteligente para el sector norte.</p>
+          <div class="coop-badge">
+            <i data-lucide="radio" style="width: 14px; height: 14px;"></i> En línea
+          </div>
+        </div>
+
+        <!-- Cooperativa B -->
+        <div class="coop-card" data-coop-id="coop-b">
+          <div class="coop-icon">
+            <i data-lucide="building"></i>
+          </div>
+          <h3 class="coop-name">Cooperativa B</h3>
+          <p class="coop-desc">Estación de telemetría y submedidores en tiempo real sector centro.</p>
+          <div class="coop-badge">
+            <i data-lucide="radio" style="width: 14px; height: 14px;"></i> En línea
+          </div>
+        </div>
+
+        <!-- Cooperativa C -->
+        <div class="coop-card" data-coop-id="coop-c">
+          <div class="coop-icon">
+            <i data-lucide="landmark"></i>
+          </div>
+          <h3 class="coop-name">Cooperativa C</h3>
+          <p class="coop-desc">Gestión y distribución de energía inteligente sector sur.</p>
+          <div class="coop-badge">
+            <i data-lucide="radio" style="width: 14px; height: 14px;"></i> En línea
+          </div>
+        </div>
+      </div>
+
+      <!-- Embedded Iframe Telemetry Viewer -->
+      <div class="iframe-container" id="telemetry-panel">
+        <div class="iframe-header">
+          <div class="iframe-title">
+            <span class="status-dot"></span>
+            <span id="active-coop-title">Panel de Control - Cooperativa A</span>
+          </div>
+          <div class="iframe-actions">
+            <button class="iframe-btn" id="close-iframe-btn">
+              <i data-lucide="x" style="width: 16px; height: 16px;"></i> Cerrar
+            </button>
+          </div>
+        </div>
+        <div class="iframe-body">
+          <div class="iframe-loader" id="telemetry-loader">
+            <div class="spinner"></div>
+            <p>Conectando con el servidor de Telemedición...</p>
+          </div>
+          <iframe id="telemetry-iframe" src="" title="Panel de Telemedición de Cooperativa"></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-brand">
+        <a href="#inicio" class="logo">
+          <div class="logo-icon">
+            <i data-lucide="zap"></i>
+          </div>
+          <div class="logo-text">
+            ELECTRO<span>DUCTOS</span>
+          </div>
+        </a>
+        <p>Expertos en el desarrollo de infraestructura de distribución eléctrica inteligente, telemedición y energías eficientes.</p>
+      </div>
+      
+      <div class="footer-links">
+        <h4>Productos</h4>
+        <ul>
+          <li><a href="#catalogo" onclick="window.filterCategory('componentes')">Componentes Eléctricos</a></li>
+          <li><a href="#catalogo" onclick="window.filterCategory('pilares')">Pilares Tipo A, B, C</a></li>
+          <li><a href="#catalogo" onclick="window.filterCategory('subestaciones')">Subestaciones</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links">
+        <h4>Empresa</h4>
+        <ul>
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#telemedicion" onclick="window.filterCategory('telemedicion')">Telemedición</a></li>
+          <li><a href="#inicio">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2026 Electroductos.com.ar. Todos los derechos reservados.</p>
+      <p>Diseño e Ingeniería de Redes Inteligentes</p>
+    </div>
+  </footer>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Telemedición</title>
+  <style>
+    :root {
+      --bg-dash: #070B19;
+      --bg-card: #0D152D;
+      --color-primary: #00F2FE;
+      --color-secondary: #4facfe;
+      --text-main: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --border-dash: rgba(255, 255, 255, 0.08);
+    }
+    
+    body {
+      margin: 0;
+      padding: 24px;
+      background-color: var(--bg-dash);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-dash);
+      padding-bottom: 16px;
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-live {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34D399;
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      font-weight: bold;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    .grid-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-dash);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+    }
+
+    .card-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .card-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--color-primary);
+      font-family: monospace;
+    }
+
+    .card-unit {
+      font-size: 1rem;
+      color: var(--text-muted);
+      font-weight: normal;
+      margin-left: 4px;
+    }
+
+    .graph-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-dash);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .graph-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    canvas {
+      width: 100%;
+      height: 250px;
+      background: rgba(7, 11, 25, 0.5);
+      border-radius: 8px;
+      border: 1px solid var(--border-dash);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="header">
+    <div class="title-group">
+      <h2>Telemetría Activa - <span id="coop-name-display">Cooperativa B</span></h2>
+      <span class="badge-live">En Vivo</span>
+    </div>
+    <div style="font-size: 0.9rem; color: var(--text-muted);" id="date-display">
+      Actualizando...
+    </div>
+  </div>
+
+  <div class="grid-metrics">
+    <!-- Voltage Metric -->
+    <div class="card">
+      <div class="card-label">Tensión de Línea</div>
+      <div class="card-value"><span id="metric-voltage">220.5</span><span class="card-unit">V</span></div>
+    </div>
+    <!-- Current Metric -->
+    <div class="card">
+      <div class="card-label">Corriente Total</div>
+      <div class="card-value"><span id="metric-current">18.4</span><span class="card-unit">A</span></div>
+    </div>
+    <!-- Active Power Metric -->
+    <div class="card">
+      <div class="card-label">Potencia Activa</div>
+      <div class="card-value"><span id="metric-power">4.06</span><span class="card-unit">kW</span></div>
+    </div>
+    <!-- Frequency Metric -->
+    <div class="card">
+      <div class="card-label">Frecuencia</div>
+      <div class="card-value"><span id="metric-freq">50.01</span><span class="card-unit">Hz</span></div>
+    </div>
+  </div>
+
+  <div class="graph-section">
+    <div class="graph-title">Carga Activa e Historial de Demanda (Últimos 30 ciclos)</div>
+    <canvas id="chartCanvas"></canvas>
+  </div>
+
+  <div class="footer">
+    Servidor de Datos Remotos USRIOT • Encriptación SSL Habilitada • Electroductos.com.ar Telemetría
+  </div>
+
+  <script>
+    // Get coop parameter from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const coopCode = urlParams.get('coop') || 'B';
+    document.getElementById('coop-name-display').innerText = `Cooperativa ${coopCode}`;
+
+    // Live Metrics Update
+    const metrics = {
+      voltage: 220.0,
+      current: coopCode === 'B' ? 18.4 : 24.2,
+      power: 0,
+      freq: 50.00
+    };
+
+    const voltageEl = document.getElementById('metric-voltage');
+    const currentEl = document.getElementById('metric-current');
+    const powerEl = document.getElementById('metric-power');
+    const freqEl = document.getElementById('metric-freq');
+    const dateEl = document.getElementById('date-display');
+
+    // History data array for the graph
+    const historyData = Array.from({length: 30}, () => (coopCode === 'B' ? 4.0 : 5.3) + Math.random() * 0.5);
+
+    function updateLiveValues() {
+      // Simulate electrical fluctuation
+      metrics.voltage = (220.0 + (Math.random() * 4 - 2)).toFixed(1);
+      metrics.current = (coopCode === 'B' 
+        ? (18.0 + (Math.random() * 1.5 - 0.75)) 
+        : (24.0 + (Math.random() * 2.2 - 1.1))
+      ).toFixed(1);
+      
+      // Power = (Voltage * Current * PowerFactor=0.92) / 1000
+      metrics.power = ((metrics.voltage * metrics.current * 0.92) / 1000).toFixed(2);
+      metrics.freq = (50.00 + (Math.random() * 0.06 - 0.03)).toFixed(2);
+
+      voltageEl.innerText = metrics.voltage;
+      currentEl.innerText = metrics.current;
+      powerEl.innerText = metrics.power;
+      freqEl.innerText = metrics.freq;
+      
+      // Update Date
+      const now = new Date();
+      dateEl.innerText = `Sincronizado: ${now.toLocaleTimeString()}`;
+
+      // Push to chart data
+      historyData.push(parseFloat(metrics.power));
+      if (historyData.length > 30) {
+        historyData.shift();
+      }
+      
+      drawChart();
+    }
+
+    // Chart Drawing Function using Canvas 2D
+    const canvas = document.getElementById('chartCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Resize canvas correctly
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth - 48; // accounting for padding
+      canvas.height = 250;
+      drawChart();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    
+    // Initial resize
+    setTimeout(resizeCanvas, 100);
+
+    function drawChart() {
+      const w = canvas.width;
+      const h = canvas.height;
+      
+      ctx.clearRect(0, 0, w, h);
+      
+      // Draw grid lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.lineWidth = 1;
+      const gridCount = 5;
+      for (let i = 1; i < gridCount; i++) {
+        const y = (h / gridCount) * i;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      // Calculate graph bounding coordinates
+      const maxVal = Math.max(...historyData) * 1.15;
+      const minVal = Math.min(...historyData) * 0.85;
+      const valRange = maxVal - minVal;
+      
+      const paddingLeft = 40;
+      const paddingRight = 20;
+      const paddingTop = 20;
+      const paddingBottom = 20;
+      
+      const graphWidth = w - paddingLeft - paddingRight;
+      const graphHeight = h - paddingTop - paddingBottom;
+
+      const points = [];
+      const step = graphWidth / (historyData.length - 1);
+      
+      for (let i = 0; i < historyData.length; i++) {
+        const x = paddingLeft + i * step;
+        const normalizedVal = (historyData[i] - minVal) / valRange;
+        const y = h - paddingBottom - (normalizedVal * graphHeight);
+        points.push({x, y});
+      }
+
+      // Draw Gradient fill below curve
+      if (points.length > 0) {
+        const grad = ctx.createLinearGradient(0, paddingTop, 0, h - paddingBottom);
+        grad.addColorStop(0, 'rgba(0, 242, 254, 0.25)');
+        grad.addColorStop(1, 'rgba(0, 242, 254, 0)');
+        
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, h - paddingBottom);
+        points.forEach(pt => ctx.lineTo(pt.x, pt.y));
+        ctx.lineTo(points[points.length - 1].x, h - paddingBottom);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+
+      // Draw curve line
+      ctx.strokeStyle = '#00F2FE';
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      
+      ctx.beginPath();
+      if (points.length > 0) {
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+          // Smooth bezier curve calculations
+          const xc = (points[i].x + points[i - 1].x) / 2;
+          const yc = (points[i].y + points[i - 1].y) / 2;
+          ctx.quadraticCurveTo(points[i - 1].x, points[i - 1].y, xc, yc);
+        }
+        ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+      }
+      ctx.stroke();
+
+      // Draw dots for the last point
+      if (points.length > 0) {
+        const lastPt = points[points.length - 1];
+        ctx.fillStyle = '#00F2FE';
+        ctx.beginPath();
+        ctx.arc(lastPt.x, lastPt.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(lastPt.x, lastPt.y, 10, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Draw labels
+      ctx.fillStyle = '#9CA3AF';
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(maxVal.toFixed(1) + 'kW', paddingLeft - 8, paddingTop + 4);
+      ctx.fillText(minVal.toFixed(1) + 'kW', paddingLeft - 8, h - paddingBottom + 4);
+    }
+
+    // Set interval to update metrics every 2 seconds
+    setInterval(updateLiveValues, 2000);
+    
+    // Trigger initial values
+    updateLiveValues();
+  </script>
+</body>
+</html>
