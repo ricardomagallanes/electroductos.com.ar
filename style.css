@@ -583,17 +583,14 @@ main {
 /* Telemedicion Details Panel (Iframe Viewer) */
 .iframe-container {
   display: none;
-  margin-top: 40px;
+  width: 80%;
+  margin: 40px auto 0 auto;
   background: var(--bg-secondary);
   border: 1px solid rgba(0, 242, 254, 0.2);
   border-radius: var(--border-radius);
   overflow: hidden;
   box-shadow: var(--shadow-card), 0 0 40px rgba(0, 242, 254, 0.08);
   animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  width: 80vw;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
 .iframe-container.active {
