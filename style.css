@@ -43,7 +43,7 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-y: scroll; /* Scrollbar siempre visible para evitar desplazamiento del contenido al centrar */
+  overflow-x: hidden; /* Evita scroll horizontal causado por elementos decorativos con posicionamiento negativo */
 }
 
 body {
