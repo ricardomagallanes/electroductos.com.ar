@@ -76,7 +76,7 @@ const products = [
 
 // URLs for Telemetry dashboards
 const telemetryUrls = {
-  'coop-a': 'https://mp.usriot.com/draw/s.html?s=snk6xse5t8&a=aHR0cHM6Ly9hcGkubXAudXNyaW90LmNvbS91c3JDbG91ZA==&l=en',
+  'coop-a': 'https://shenmu.usriot.com/share?s=fcc9ub9b1z&a=aHR0cHM6Ly9zaGVubXUudXNyaW90LmNvbS9zaGFyZQ==&l=en',
   'coop-b': 'coop_dashboard.html?coop=B',
   'coop-c': 'coop_dashboard.html?coop=C'
 };
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
   initMobileMenu();
   initTelemetryEvents();
-  
+
   // Header scroll class toggle
   window.addEventListener('scroll', () => {
     if (window.scrollY > 50) {
@@ -115,7 +115,16 @@ document.addEventListener('DOMContentLoaded', () => {
       siteHeader.classList.remove('scrolled');
     }
   });
-  
+
+  // Botón "Ver Telemedición" del hero → navegar a la sección de telemedición
+  document.getElementById('hero-btn-telemetry').addEventListener('click', (e) => {
+    e.preventDefault();
+    handleCategoryNavigation('telemedicion');
+    // Actualizar tab y nav activos
+    tabs.forEach(t => t.classList.toggle('active', t.getAttribute('data-category') === 'telemedicion'));
+    navItems.forEach(n => n.classList.toggle('active', n.getAttribute('data-target') === 'telemedicion'));
+  });
+
   // Initialize Lucide Icons
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
@@ -125,12 +134,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // Render products dynamically based on category filter
 function renderProducts(category) {
   grid.innerHTML = '';
-  
+
   // Filter products by category
-  const filtered = category === 'all' 
-    ? products 
+  const filtered = category === 'all'
+    ? products
     : products.filter(p => p.category === category);
-    
+
   if (filtered.length === 0) {
     grid.innerHTML = `
       <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
@@ -141,15 +150,15 @@ function renderProducts(category) {
     if (typeof lucide !== 'undefined') lucide.createIcons();
     return;
   }
-  
+
   filtered.forEach(product => {
     const card = document.createElement('div');
     card.className = 'product-card';
     card.setAttribute('data-category', product.category);
-    
+
     // Create bullet point specs list
     const specsHtml = product.specs.map(spec => `<li>• ${spec}</li>`).join('');
-    
+
     card.innerHTML = `
       <div class="product-image-container">
         <span class="product-badge">${product.category.toUpperCase()}</span>
@@ -173,7 +182,7 @@ function renderProducts(category) {
     `;
     grid.appendChild(card);
   });
-  
+
   // Re-run icon replacement
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
@@ -186,11 +195,11 @@ function initNavigation() {
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       const cat = tab.getAttribute('data-category');
-      
+
       // Update active tab button
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      
+
       // Update nav links active state
       navItems.forEach(n => {
         n.classList.remove('active');
@@ -198,21 +207,21 @@ function initNavigation() {
           n.classList.add('active');
         }
       });
-      
+
       // Show/Hide relevant sections
       handleCategoryNavigation(cat);
     });
   });
-  
+
   // Header navigation links
   navItems.forEach(item => {
     item.addEventListener('click', (e) => {
       const targetCat = item.getAttribute('data-target');
-      
+
       // Update header active styling
       navItems.forEach(n => n.classList.remove('active'));
       item.classList.add('active');
-      
+
       // Update category selector tabs active styling
       tabs.forEach(t => {
         if (t.getAttribute('data-category') === targetCat) {
@@ -221,9 +230,9 @@ function initNavigation() {
           t.classList.remove('active');
         }
       });
-      
+
       handleCategoryNavigation(targetCat);
-      
+
       // Close mobile menu if open
       navLinks.classList.remove('mobile-active');
       mobileMenuBtn.innerHTML = '<i data-lucide="menu"></i>';
@@ -247,16 +256,16 @@ function handleCategoryNavigation(category) {
     catalogSection.style.display = 'none';
     heroSection.style.display = 'none';
     telemetrySection.classList.add('active');
-    
+
     // Smooth scroll to telemetry
     telemetrySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } else {
     catalogSection.style.display = 'block';
     heroSection.style.display = 'flex';
     telemetrySection.classList.remove('active');
-    
+
     renderProducts(category);
-    
+
     // Smooth scroll to catalog
     catalogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -266,10 +275,10 @@ function handleCategoryNavigation(category) {
 function initMobileMenu() {
   mobileMenuBtn.addEventListener('click', () => {
     const isActive = navLinks.classList.toggle('mobile-active');
-    mobileMenuBtn.innerHTML = isActive 
-      ? '<i data-lucide="x"></i>' 
+    mobileMenuBtn.innerHTML = isActive
+      ? '<i data-lucide="x"></i>'
       : '<i data-lucide="menu"></i>';
-      
+
     if (typeof lucide !== 'undefined') {
       lucide.createIcons();
     }
@@ -283,31 +292,31 @@ function initTelemetryEvents() {
       const coopId = card.getAttribute('data-coop-id');
       const coopName = card.querySelector('.coop-name').innerText;
       const url = telemetryUrls[coopId];
-      
+
       // Show loader and update title
       telemetryLoader.style.opacity = '1';
       telemetryLoader.style.pointerEvents = 'all';
       activeCoopTitle.innerText = `Panel de Control - ${coopName}`;
-      
+
       // Update iframe source
       telemetryIframe.src = url;
-      
+
       // Open panel
       telemetryPanel.classList.add('active');
-      
+
       // Smooth scroll to panel
       setTimeout(() => {
         telemetryPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 100);
     });
   });
-  
+
   // Hide loader once iframe is fully loaded
   telemetryIframe.addEventListener('load', () => {
     telemetryLoader.style.opacity = '0';
     telemetryLoader.style.pointerEvents = 'none';
   });
-  
+
   // Close Iframe Viewer
   closeIframeBtn.addEventListener('click', () => {
     telemetryPanel.classList.remove('active');
