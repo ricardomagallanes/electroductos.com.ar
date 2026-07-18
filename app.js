@@ -100,6 +100,15 @@ const telemetryLoader = document.getElementById('telemetry-loader');
 const activeCoopTitle = document.getElementById('active-coop-title');
 const closeIframeBtn = document.getElementById('close-iframe-btn');
 
+// Clerk DOM Elements
+const orgSwitcherDiv = document.getElementById('clerk-org-switcher');
+const adminControlsDiv = document.getElementById('clerk-admin-controls');
+const manageOrgBtn = document.getElementById('clerk-manage-org-btn');
+const orgProfileModal = document.getElementById('clerk-org-profile-modal');
+const closeOrgProfileModalBtn = document.getElementById('close-org-profile-modal-btn');
+const orgProfileContainer = document.getElementById('clerk-org-profile-container');
+
+
 // Initialize Website
 document.addEventListener('DOMContentLoaded', () => {
   renderProducts('all');
@@ -165,6 +174,37 @@ async function initClerk() {
         loginBtn.addEventListener('click', openLogin);
         telemetryLoginBtn.addEventListener('click', openLogin);
 
+        // Listeners for Admin Organization Profile Modal
+        manageOrgBtn.addEventListener('click', () => {
+          orgProfileModal.style.display = 'flex';
+          
+          // Mount Organization Profile inside modal
+          if (orgProfileContainer.children.length === 0) {
+            window.Clerk.mountOrganizationProfile(orgProfileContainer, {
+              appearance: {
+                variables: {
+                  colorPrimary: '#00F2FE',
+                  colorBackground: '#0D152D',
+                  colorText: '#F3F4F6',
+                  colorInputBackground: '#070B19',
+                  colorInputText: '#F3F4F6'
+                }
+              }
+            });
+          }
+        });
+
+        closeOrgProfileModalBtn.addEventListener('click', () => {
+          orgProfileModal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside content area
+        orgProfileModal.addEventListener('click', (e) => {
+          if (e.target === orgProfileModal) {
+            orgProfileModal.style.display = 'none';
+          }
+        });
+
         // Listen for session updates
         window.Clerk.addListener(({ user }) => {
           updateAuthState();
@@ -189,6 +229,7 @@ function updateAuthState() {
     // User is logged in
     loginBtn.style.display = 'none';
     userButtonDiv.style.display = 'block';
+    orgSwitcherDiv.style.display = 'block';
     
     // Mount user profile button if not already mounted
     if (userButtonDiv.children.length === 0) {
@@ -202,17 +243,39 @@ function updateAuthState() {
       });
     }
 
+    // Mount Organization Switcher in header
+    if (orgSwitcherDiv.children.length === 0) {
+      window.Clerk.mountOrganizationSwitcher(orgSwitcherDiv, {
+        appearance: {
+          variables: {
+            colorPrimary: '#00F2FE',
+            colorBackground: '#0D152D',
+            colorText: '#F3F4F6'
+          }
+        }
+      });
+    }
+
     // Ocultar panel de login e inicializar datos de telemetría
     authPanel.style.display = 'none';
     coopGrid.style.display = 'grid';
     telemetrySubtitle.style.display = 'block';
 
     // OBTENER MEMBRESÍAS DE ORGANIZACIÓN DEL USUARIO
-    // Estructura en Clerk: window.Clerk.user.organizationMemberships
     const memberships = window.Clerk.user.organizationMemberships || [];
     
     // Obtener nombres/slugs de las organizaciones del usuario en minúsculas para comparar
     const userOrgs = memberships.map(m => m.organization.name.toLowerCase());
+    
+    // Verificar si el usuario es ADMINISTRADOR de alguna organización
+    // Clerk asigna roles como 'org:admin' o 'admin'
+    const isAdmin = memberships.some(m => m.role === 'org:admin' || m.role === 'admin');
+    
+    if (isAdmin) {
+      adminControlsDiv.style.display = 'block'; // Mostrar botón de gestión
+    } else {
+      adminControlsDiv.style.display = 'none';
+    }
     
     // Filtrar tarjetas de cooperativas en pantalla
     let visibleCoopsCount = 0;
@@ -240,15 +303,19 @@ function updateAuthState() {
     loginBtn.style.display = 'block';
     userButtonDiv.innerHTML = '';
     userButtonDiv.style.display = 'none';
+    orgSwitcherDiv.innerHTML = '';
+    orgSwitcherDiv.style.display = 'none';
+    adminControlsDiv.style.display = 'none';
 
     // Hide telemetry data
     authPanel.style.display = 'block';
     coopGrid.style.display = 'none';
     telemetrySubtitle.style.display = 'none';
     
-    // Make sure panel is closed if open
+    // Make sure panels/modals are closed
     telemetryPanel.classList.remove('active');
     telemetryIframe.src = '';
+    orgProfileModal.style.display = 'none';
   }
 }
 
