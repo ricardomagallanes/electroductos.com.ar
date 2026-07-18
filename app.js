@@ -101,6 +101,7 @@ const activeCoopTitle = document.getElementById('active-coop-title');
 const closeIframeBtn = document.getElementById('close-iframe-btn');
 
 // Clerk DOM Elements
+const orgSwitcherDiv = document.getElementById('clerk-org-switcher');
 const adminControlsDiv = document.getElementById('clerk-admin-controls');
 const manageOrgBtn = document.getElementById('clerk-manage-org-btn');
 const orgProfileModal = document.getElementById('clerk-org-profile-modal');
@@ -154,7 +155,7 @@ async function initClerk() {
       try {
         await window.Clerk.load();
         updateAuthState();
-        
+
         // Listeners for login buttons
         const openLogin = () => {
           window.Clerk.openSignIn({
@@ -176,7 +177,7 @@ async function initClerk() {
         // Listeners for Admin Organization Profile Modal
         manageOrgBtn.addEventListener('click', () => {
           orgProfileModal.style.display = 'flex';
-          
+
           // Mount Organization Profile inside modal
           if (orgProfileContainer.children.length === 0) {
             window.Clerk.mountOrganizationProfile(orgProfileContainer, {
@@ -222,25 +223,32 @@ function updateAuthState() {
   const coopGrid = document.getElementById('cooperatives-display-grid');
   const telemetrySubtitle = document.getElementById('telemetry-subtitle');
 
-  console.log("Clerk: actualizando estado de autenticación...");
-  console.log("Clerk disponible:", !!window.Clerk);
-  if (window.Clerk) {
-    console.log("Usuario detectado por Clerk:", window.Clerk.user);
-  }
-
   if (!window.Clerk) return;
 
   if (window.Clerk.user) {
     // User is logged in
-    console.log("Clerk: usuario autenticado, mostrando perfil");
     loginBtn.style.display = 'none';
     userButtonDiv.style.display = 'block';
-    
+    orgSwitcherDiv.style.display = 'block';
+
     // Mount user profile button if not already mounted
     if (userButtonDiv.children.length === 0) {
       window.Clerk.mountUserButton(userButtonDiv, {
         appearance: {
           variables: {
+            colorBackground: '#0D152D',
+            colorText: '#F3F4F6'
+          }
+        }
+      });
+    }
+
+    // Mount Organization Switcher in header
+    if (orgSwitcherDiv.children.length === 0) {
+      window.Clerk.mountOrganizationSwitcher(orgSwitcherDiv, {
+        appearance: {
+          variables: {
+            colorPrimary: '#00F2FE',
             colorBackground: '#0D152D',
             colorText: '#F3F4F6'
           }
@@ -255,25 +263,25 @@ function updateAuthState() {
 
     // OBTENER MEMBRESÍAS DE ORGANIZACIÓN DEL USUARIO
     const memberships = window.Clerk.user.organizationMemberships || [];
-    
+
     // Obtener nombres/slugs de las organizaciones del usuario en minúsculas para comparar
     const userOrgs = memberships.map(m => m.organization.name.toLowerCase());
-    
+
     // Verificar si el usuario es ADMINISTRADOR de alguna organización
     // Clerk asigna roles como 'org:admin' o 'admin'
     const isAdmin = memberships.some(m => m.role === 'org:admin' || m.role === 'admin');
-    
+
     if (isAdmin) {
       adminControlsDiv.style.display = 'block'; // Mostrar botón de gestión
     } else {
       adminControlsDiv.style.display = 'none';
     }
-    
+
     // Filtrar tarjetas de cooperativas en pantalla
     let visibleCoopsCount = 0;
     coopCards.forEach(card => {
       const coopName = card.querySelector('.coop-name').innerText.toLowerCase(); // ej: "cooperativa a"
-      
+
       // Si el usuario pertenece a la organización correspondiente, mostrar la tarjeta. Si no, ocultarla.
       if (userOrgs.includes(coopName)) {
         card.style.display = 'flex';
@@ -295,13 +303,15 @@ function updateAuthState() {
     loginBtn.style.display = 'block';
     userButtonDiv.innerHTML = '';
     userButtonDiv.style.display = 'none';
+    orgSwitcherDiv.innerHTML = '';
+    orgSwitcherDiv.style.display = 'none';
     adminControlsDiv.style.display = 'none';
 
     // Hide telemetry data
     authPanel.style.display = 'block';
     coopGrid.style.display = 'none';
     telemetrySubtitle.style.display = 'none';
-    
+
     // Make sure panels/modals are closed
     telemetryPanel.classList.remove('active');
     telemetryIframe.src = '';

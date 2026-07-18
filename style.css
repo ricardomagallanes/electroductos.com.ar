@@ -877,3 +877,37 @@ footer {
     text-align: center;
   }
 }
+
+/* ===== Clerk Auth UI Overrides ===== */
+/* Ensure user button container shows inline once mounted */
+#clerk-user-button:not(:empty) {
+  display: flex !important;
+  align-items: center;
+}
+
+/* Ensure org switcher container shows inline once mounted */
+#clerk-org-switcher:not(:empty) {
+  display: flex !important;
+  align-items: center;
+}
+
+/* Override Clerk's default white background in dark theme */
+.cl-rootBox,
+.cl-userButtonBox,
+.cl-organizationSwitcherTrigger {
+  background: transparent !important;
+}
+
+/* Clerk avatar border glow */
+.cl-userButtonAvatarBox,
+.cl-organizationSwitcherTriggerIcon {
+  border: 1.5px solid rgba(0, 242, 254, 0.3) !important;
+  border-radius: 50%;
+  transition: border-color 0.2s ease;
+}
+
+.cl-userButtonAvatarBox:hover,
+.cl-organizationSwitcherTrigger:hover .cl-organizationSwitcherTriggerIcon {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.25);
+}
