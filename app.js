@@ -222,10 +222,17 @@ function updateAuthState() {
   const coopGrid = document.getElementById('cooperatives-display-grid');
   const telemetrySubtitle = document.getElementById('telemetry-subtitle');
 
+  console.log("Clerk: actualizando estado de autenticación...");
+  console.log("Clerk disponible:", !!window.Clerk);
+  if (window.Clerk) {
+    console.log("Usuario detectado por Clerk:", window.Clerk.user);
+  }
+
   if (!window.Clerk) return;
 
   if (window.Clerk.user) {
     // User is logged in
+    console.log("Clerk: usuario autenticado, mostrando perfil");
     loginBtn.style.display = 'none';
     userButtonDiv.style.display = 'block';
     
