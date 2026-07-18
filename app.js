@@ -202,10 +202,39 @@ function updateAuthState() {
       });
     }
 
-    // Show telemetry data
+    // Ocultar panel de login e inicializar datos de telemetría
     authPanel.style.display = 'none';
     coopGrid.style.display = 'grid';
     telemetrySubtitle.style.display = 'block';
+
+    // OBTENER MEMBRESÍAS DE ORGANIZACIÓN DEL USUARIO
+    // Estructura en Clerk: window.Clerk.user.organizationMemberships
+    const memberships = window.Clerk.user.organizationMemberships || [];
+    
+    // Obtener nombres/slugs de las organizaciones del usuario en minúsculas para comparar
+    const userOrgs = memberships.map(m => m.organization.name.toLowerCase());
+    
+    // Filtrar tarjetas de cooperativas en pantalla
+    let visibleCoopsCount = 0;
+    coopCards.forEach(card => {
+      const coopName = card.querySelector('.coop-name').innerText.toLowerCase(); // ej: "cooperativa a"
+      
+      // Si el usuario pertenece a la organización correspondiente, mostrar la tarjeta. Si no, ocultarla.
+      if (userOrgs.includes(coopName)) {
+        card.style.display = 'flex';
+        visibleCoopsCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Si no pertenece a ninguna cooperativa todavía, mostrar un mensaje amistoso
+    if (visibleCoopsCount === 0) {
+      telemetrySubtitle.innerText = "No tienes asignada ninguna cooperativa. Solicita acceso a un administrador.";
+    } else {
+      telemetrySubtitle.innerText = "Seleccione una cooperativa para visualizar el panel de control y mediciones en tiempo real.";
+    }
+
   } else {
     // User is logged out
     loginBtn.style.display = 'block';
