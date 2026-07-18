@@ -101,7 +101,6 @@ const activeCoopTitle = document.getElementById('active-coop-title');
 const closeIframeBtn = document.getElementById('close-iframe-btn');
 
 // Clerk DOM Elements
-const orgSwitcherDiv = document.getElementById('clerk-org-switcher');
 const adminControlsDiv = document.getElementById('clerk-admin-controls');
 const manageOrgBtn = document.getElementById('clerk-manage-org-btn');
 const orgProfileModal = document.getElementById('clerk-org-profile-modal');
@@ -229,26 +228,12 @@ function updateAuthState() {
     // User is logged in
     loginBtn.style.display = 'none';
     userButtonDiv.style.display = 'block';
-    orgSwitcherDiv.style.display = 'block';
     
     // Mount user profile button if not already mounted
     if (userButtonDiv.children.length === 0) {
       window.Clerk.mountUserButton(userButtonDiv, {
         appearance: {
           variables: {
-            colorBackground: '#0D152D',
-            colorText: '#F3F4F6'
-          }
-        }
-      });
-    }
-
-    // Mount Organization Switcher in header
-    if (orgSwitcherDiv.children.length === 0) {
-      window.Clerk.mountOrganizationSwitcher(orgSwitcherDiv, {
-        appearance: {
-          variables: {
-            colorPrimary: '#00F2FE',
             colorBackground: '#0D152D',
             colorText: '#F3F4F6'
           }
@@ -303,8 +288,6 @@ function updateAuthState() {
     loginBtn.style.display = 'block';
     userButtonDiv.innerHTML = '';
     userButtonDiv.style.display = 'none';
-    orgSwitcherDiv.innerHTML = '';
-    orgSwitcherDiv.style.display = 'none';
     adminControlsDiv.style.display = 'none';
 
     // Hide telemetry data
