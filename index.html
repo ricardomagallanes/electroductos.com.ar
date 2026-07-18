@@ -35,9 +35,23 @@
         <li class="nav-item" data-target="pilares"><a href="#catalogo">Pilares</a></li>
         <li class="nav-item" data-target="subestaciones"><a href="#catalogo">Subestaciones</a></li>
         <li class="nav-item" data-target="telemedicion"><a href="#telemedicion">Telemedición</a></li>
+        <!-- Clerk Auth Controls -->
+        <li class="nav-item" id="auth-nav-item" style="display: flex; align-items: center; padding-left: 10px;">
+          <div id="clerk-user-button"></div>
+          <button class="btn btn-secondary" id="clerk-login-btn" style="padding: 8px 16px; font-size: 0.85rem; border-radius: 20px; display: none;">Ingresar</button>
+        </li>
       </ul>
     </div>
   </header>
+
+  <!-- Clerk SDK Script -->
+  <script
+    async
+    crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_cmVsYXRpdmUtbGFicmFkb3ItNTEuY2xlcmsuYWNjb3VudHMuZGV2JA"
+    src="https://relative-labrador-51.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+    type="text/javascript"
+  ></script>
 
   <!-- Hero Section -->
   <section class="hero" id="inicio">
@@ -95,7 +109,19 @@
     <!-- Telemedición Section (Cooperatives & Embedded Panel) -->
     <section id="telemedicion" class="coop-section">
       <h2 class="section-title">Servicio de Telemedición</h2>
-      <p class="section-subtitle">Seleccione una cooperativa para visualizar el panel de control y mediciones en tiempo real.</p>
+      <p class="section-subtitle" id="telemetry-subtitle">Seleccione una cooperativa para visualizar el panel de control y mediciones en tiempo real.</p>
+      
+      <!-- Unauthenticated Prompt Container -->
+      <div id="clerk-auth-required-panel" style="display: none; text-align: center; max-width: 500px; margin: 40px auto; padding: 40px 24px; background: var(--bg-secondary); border: 1px solid var(--border-glass); border-radius: var(--border-radius); box-shadow: var(--shadow-card);">
+        <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.15); display: flex; align-items: center; justify-content: center; color: var(--color-primary); margin: 0 auto 24px auto;">
+          <i data-lucide="lock" style="width: 32px; height: 32px;"></i>
+        </div>
+        <h3 style="font-size: 1.5rem; margin-bottom: 12px; font-family: var(--font-headings);">Acceso Restringido</h3>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">Debes iniciar sesión con tu cuenta autorizada para acceder a la visualización de paneles y telemetría de cooperativas.</p>
+        <button class="btn btn-primary" id="clerk-telemetry-login-btn">
+          Iniciar Sesión <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
       
       <!-- Cooperatives Cards Grid -->
       <div class="coop-grid" id="cooperatives-display-grid">

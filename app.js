@@ -125,11 +125,103 @@ document.addEventListener('DOMContentLoaded', () => {
     navItems.forEach(n => n.classList.toggle('active', n.getAttribute('data-target') === 'telemedicion'));
   });
 
+  // Init Clerk Authentication
+  initClerk();
+
   // Initialize Lucide Icons
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
 });
+
+// Clerk Auth Logic
+async function initClerk() {
+  const loginBtn = document.getElementById('clerk-login-btn');
+  const telemetryLoginBtn = document.getElementById('clerk-telemetry-login-btn');
+
+  // Wait for the script tag to load
+  let interval = setInterval(async () => {
+    if (window.Clerk) {
+      clearInterval(interval);
+      try {
+        await window.Clerk.load();
+        updateAuthState();
+        
+        // Listeners for login buttons
+        const openLogin = () => {
+          window.Clerk.openSignIn({
+            appearance: {
+              variables: {
+                colorPrimary: '#00F2FE',
+                colorBackground: '#0D152D',
+                colorText: '#F3F4F6',
+                colorInputBackground: '#070B19',
+                colorInputText: '#F3F4F6'
+              }
+            }
+          });
+        };
+
+        loginBtn.addEventListener('click', openLogin);
+        telemetryLoginBtn.addEventListener('click', openLogin);
+
+        // Listen for session updates
+        window.Clerk.addListener(({ user }) => {
+          updateAuthState();
+        });
+      } catch (err) {
+        console.error("Clerk could not load:", err);
+      }
+    }
+  }, 100);
+}
+
+function updateAuthState() {
+  const userButtonDiv = document.getElementById('clerk-user-button');
+  const loginBtn = document.getElementById('clerk-login-btn');
+  const authPanel = document.getElementById('clerk-auth-required-panel');
+  const coopGrid = document.getElementById('cooperatives-display-grid');
+  const telemetrySubtitle = document.getElementById('telemetry-subtitle');
+
+  if (!window.Clerk) return;
+
+  if (window.Clerk.user) {
+    // User is logged in
+    loginBtn.style.display = 'none';
+    userButtonDiv.style.display = 'block';
+    
+    // Mount user profile button if not already mounted
+    if (userButtonDiv.children.length === 0) {
+      window.Clerk.mountUserButton(userButtonDiv, {
+        appearance: {
+          variables: {
+            colorBackground: '#0D152D',
+            colorText: '#F3F4F6'
+          }
+        }
+      });
+    }
+
+    // Show telemetry data
+    authPanel.style.display = 'none';
+    coopGrid.style.display = 'grid';
+    telemetrySubtitle.style.display = 'block';
+  } else {
+    // User is logged out
+    loginBtn.style.display = 'block';
+    userButtonDiv.innerHTML = '';
+    userButtonDiv.style.display = 'none';
+
+    // Hide telemetry data
+    authPanel.style.display = 'block';
+    coopGrid.style.display = 'none';
+    telemetrySubtitle.style.display = 'none';
+    
+    // Make sure panel is closed if open
+    telemetryPanel.classList.remove('active');
+    telemetryIframe.src = '';
+  }
+}
 
 // Render products dynamically based on category filter
 function renderProducts(category) {
