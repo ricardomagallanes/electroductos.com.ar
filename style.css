@@ -585,7 +585,7 @@ main {
 /* Telemedicion Details Panel (Iframe Viewer) */
 .iframe-container {
   display: none;
-  width: 95%;
+  width: 90%;
   margin: 40px auto 0 auto;
   background: var(--bg-secondary);
   border: 1px solid rgba(0, 242, 254, 0.2);
