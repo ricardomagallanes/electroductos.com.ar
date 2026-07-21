@@ -181,17 +181,33 @@ header.scrolled {
   box-shadow: var(--shadow-glow);
 }
 
-.logo-text span {
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.15;
+}
+
+.logo-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: var(--font-headings);
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.logo-title span {
   background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.logo-country {
-  font-size: 0.8rem;
+.logo-subtext {
+  font-size: 0.72rem;
   font-weight: 500;
   color: var(--text-muted);
-  letter-spacing: 0.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
 /* Desktop Menu */
