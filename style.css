@@ -119,7 +119,7 @@ header {
   left: 0;
   width: 100%;
   height: var(--header-height);
-  background: var(--bg-glass);
+  background: rgba(7, 11, 25, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-glass);
@@ -131,7 +131,7 @@ header {
 
 header.scrolled {
   height: 70px;
-  background: rgba(7, 11, 25, 0.9);
+  background: rgba(7, 11, 25, 0.92);
   border-bottom: 1px solid rgba(0, 242, 254, 0.15);
 }
 
