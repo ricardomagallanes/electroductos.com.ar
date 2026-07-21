@@ -131,8 +131,8 @@ header {
 
 header.scrolled {
   height: 70px;
-  background: rgba(172, 183, 221, 0.9);
-  border-bottom: 1px solid rgba(0, 242, 255, 0.15);
+  background: rgba(7, 11, 25, 0.9);
+  border-bottom: 1px solid rgba(5, 233, 245, 0.15);
 }
 
 .nav-container {
@@ -173,11 +173,11 @@ header.scrolled {
   width: 40px;
   height: 40px;
   background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  border-radius: 20px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-main);
+  color: var(--text-dark);
   box-shadow: var(--shadow-glow);
 }
 
