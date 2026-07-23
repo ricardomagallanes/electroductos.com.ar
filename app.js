@@ -467,13 +467,6 @@ function initTelemetryEvents() {
 
       if (!url) return;
 
-      // Si la URL es externa y NO es un panel embebible (ej: Grafana d-solo o Node-RED en ngrok), abrir en nueva pestaña por restricciones de X-Frame-Options
-      const isEmbeddable = url.includes('/d-solo/') || url.includes('ngrok-free.dev') || url.includes('/nodered/');
-      if ((url.startsWith('http://') || url.startsWith('https://')) && !isEmbeddable) {
-        window.open(url, '_blank', 'noopener,noreferrer');
-        return;
-      }
-
       // Show loader and update title
       telemetryLoader.style.opacity = '1';
       telemetryLoader.style.pointerEvents = 'all';
