@@ -77,7 +77,7 @@ const products = [
 // URLs for Telemetry dashboards
 const telemetryUrls = {
   'coop-a': 'https://shenmu.usriot.com/share?s=fcc9ub9b1z&a=aHR0cHM6Ly9zaGVubXUudXNyaW90LmNvbS9zaGFyZQ==&l=en',
-  'coop-b': 'coop_dashboard.html?coop=B',
+  'coop-b': 'https://heartydonkey3023.grafana.net/public-dashboards/a1b1cf4415c84539931060c4ddb59d26',
   'coop-c': 'coop_dashboard.html?coop=C'
 };
 
