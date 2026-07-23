@@ -465,6 +465,14 @@ function initTelemetryEvents() {
       const coopName = card.querySelector('.coop-name').innerText;
       const url = telemetryUrls[coopId];
 
+      if (!url) return;
+
+      // Si la URL es externa (http/https), abrir en nueva pestaña por restricciones del servidor (ej. Grafana X-Frame-Options)
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+        return;
+      }
+
       // Show loader and update title
       telemetryLoader.style.opacity = '1';
       telemetryLoader.style.pointerEvents = 'all';
