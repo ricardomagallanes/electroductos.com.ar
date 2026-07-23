@@ -78,7 +78,7 @@ const products = [
 const telemetryUrls = {
   'coop-a': 'https://shenmu.usriot.com/share?s=fcc9ub9b1z&a=aHR0cHM6Ly9zaGVubXUudXNyaW90LmNvbS9zaGFyZQ==&l=en',
   'coop-b': 'https://heartydonkey3023.grafana.net/public-dashboards/a1b1cf4415c84539931060c4ddb59d26',
-  'coop-c': 'https://heartydonkey3023.grafana.net/d-solo/elr7vn5/panel-general?orgId=1&from=1784775679576&to=1784776312507&timezone=browser&refresh=30s&panelId=panel-1'
+  'coop-c': 'https://liberalistic-grinningly-caylee.ngrok-free.dev/nodered/ui/#!/0?socketid=XYKQyYr-wwbjIbqvAAAJ'
 };
 
 // DOM Elements
@@ -467,8 +467,9 @@ function initTelemetryEvents() {
 
       if (!url) return;
 
-      // Si la URL es externa y NO es un panel embebible /d-solo/ de Grafana, abrir en nueva pestaña por restricciones de X-Frame-Options
-      if ((url.startsWith('http://') || url.startsWith('https://')) && !url.includes('/d-solo/')) {
+      // Si la URL es externa y NO es un panel embebible (ej: Grafana d-solo o Node-RED en ngrok), abrir en nueva pestaña por restricciones de X-Frame-Options
+      const isEmbeddable = url.includes('/d-solo/') || url.includes('ngrok-free.dev') || url.includes('/nodered/');
+      if ((url.startsWith('http://') || url.startsWith('https://')) && !isEmbeddable) {
         window.open(url, '_blank', 'noopener,noreferrer');
         return;
       }
