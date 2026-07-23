@@ -77,7 +77,7 @@ const products = [
 // URLs for Telemetry dashboards
 const telemetryUrls = {
   'coop-a': 'https://shenmu.usriot.com/share?s=fcc9ub9b1z&a=aHR0cHM6Ly9zaGVubXUudXNyaW90LmNvbS9zaGFyZQ==&l=en',
-  'coop-b': 'https://heartydonkey3023.grafana.net/public-dashboards/a1b1cf4415c84539931060c4ddb59d26',
+  'coop-b': 'https://thingsboard.cloud/dashboard/76968970-86ac-11f1-a3bc-95bc3f4b3917?publicId=0fc09d70-86da-11f1-bb5b-f59caa77e86d',
   'coop-c': 'https://liberalistic-grinningly-caylee.ngrok-free.dev/nodered/ui/#!/0?socketid=XYKQyYr-wwbjIbqvAAAJ'
 };
 
