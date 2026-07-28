@@ -58,14 +58,6 @@ export default async function handler(req, res) {
             }
         }
 
-        // Sanitizar UUID: Extraer estrictamente el formato 8-4-4-4-12 para evitar IDs duplicados/corruptos
-        if (targetUserId) {
-            const uuidMatch = String(targetUserId).match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
-            if (uuidMatch) {
-                targetUserId = uuidMatch[0];
-            }
-        }
-
         // Clave de API a utilizar para la solicitud de Impersonation (Admin o del propio usuario)
         const apiKeyToUse = adminApiKey || userApiKey;
 
