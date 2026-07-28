@@ -74,10 +74,13 @@ const products = [
   }
 ];
 
+// ThingsBoard Dashboard ID
+const thingsboardDashboardId = 'f7e91ec0-8a21-11f1-8b3b-037118875eb0';
+
 // URLs for Telemetry dashboards
 const telemetryUrls = {
   'coop-a': 'https://shenmu.usriot.com/share?s=fcc9ub9b1z&a=aHR0cHM6Ly9zaGVubXUudXNyaW90LmNvbS9zaGFyZQ==&l=en',
-  'coop-b': 'https://thingsboard.cloud/dashboards/shared/0d03b510-8903-11f1-8b3b-037118875eb0/b210e110-8947-11f1-a3bc-95bc3f4b3917',
+  'coop-b': `https://thingsboard.cloud/dashboards/${thingsboardDashboardId}`,
   'coop-c': 'https://liberalistic-grinningly-caylee.ngrok-free.dev/nodered/ui/#!/0?socketid=XYKQyYr-wwbjIbqvAAAJ',
   'coop-d': 'https://f0a509af.us2a.app.preset.io/superset/embedded/0104b04a-5f7d-4f0c-b533-8df57fea43ee?standalone=true'
 };
@@ -458,13 +461,26 @@ function initMobileMenu() {
   });
 }
 
+// Función para obtener el token JWT de ThingsBoard desde /api/tb-token
+async function getTbToken() {
+  try {
+    const res = await fetch('/api/tb-token');
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.token || null;
+  } catch (err) {
+    console.error('Error al conectar con el backend /api/tb-token:', err);
+    return null;
+  }
+}
+
 // Telemetry Iframe Flow Events
 function initTelemetryEvents() {
   coopCards.forEach(card => {
-    card.addEventListener('click', () => {
+    card.addEventListener('click', async () => {
       const coopId = card.getAttribute('data-coop-id');
       const coopName = card.querySelector('.coop-name').innerText;
-      const url = telemetryUrls[coopId];
+      let url = telemetryUrls[coopId];
 
       if (!url) return;
 
@@ -472,6 +488,17 @@ function initTelemetryEvents() {
       telemetryLoader.style.opacity = '1';
       telemetryLoader.style.pointerEvents = 'all';
       activeCoopTitle.innerText = `Panel de Control - ${coopName}`;
+
+      // Si es la cooperativa de ThingsBoard, obtener el token de seguridad dinámicamente
+      if (coopId === 'coop-b' || url.includes('thingsboard.cloud')) {
+        const token = await getTbToken();
+        if (token) {
+          url = `https://thingsboard.cloud/dashboards/${thingsboardDashboardId}?jwt_token=${token}`;
+        } else {
+          // Si falla o estamos en desarrollo local sin backend, fallback a URL accesible
+          url = `https://thingsboard.cloud/dashboards/${thingsboardDashboardId}`;
+        }
+      }
 
       // Update iframe source
       telemetryIframe.src = url;
