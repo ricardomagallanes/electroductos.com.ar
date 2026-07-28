@@ -527,11 +527,12 @@ function initTelemetryEvents() {
         telemetryPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 100);
 
-      // Si es una URL dinámica de ThingsBoard con backend, solicitar token si corresponde
-      if (url.includes('/dashboard/') && !url.includes('/shared/')) {
+      // Si la URL es una vista privada de ThingsBoard (sin publicId ni /shared/), solicitar token JWT
+      if (url.includes('thingsboard.cloud') && !url.includes('publicId=') && !url.includes('/shared/')) {
         const { token } = await getTbToken();
         if (token) {
-          url = `${url}?accessToken=${token}&token=${token}`;
+          const connector = url.includes('?') ? '&' : '?';
+          url = `${url}${connector}accessToken=${token}&token=${token}`;
         }
       }
 
