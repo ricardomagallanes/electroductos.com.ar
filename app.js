@@ -80,7 +80,7 @@ const thingsboardDashboardId = 'f7e91ec0-8a21-11f1-8b3b-037118875eb0';
 // URLs for Telemetry dashboards
 const telemetryUrls = {
   'coop-a': 'https://shenmu.usriot.com/share?s=fcc9ub9b1z&a=aHR0cHM6Ly9zaGVubXUudXNyaW90LmNvbS9zaGFyZQ==&l=en',
-  'coop-b': `https://thingsboard.cloud/dashboards/${thingsboardDashboardId}`,
+  'coop-b': 'https://thingsboard.cloud/dashboards/shared/0d03b510-8903-11f1-8b3b-037118875eb0/b210e110-8947-11f1-a3bc-95bc3f4b3917',
   'coop-c': 'https://liberalistic-grinningly-caylee.ngrok-free.dev/nodered/ui/#!/0?socketid=XYKQyYr-wwbjIbqvAAAJ',
   'coop-d': 'https://f0a509af.us2a.app.preset.io/superset/embedded/0104b04a-5f7d-4f0c-b533-8df57fea43ee?standalone=true'
 };
@@ -500,6 +500,17 @@ function initTelemetryEvents() {
       const coopName = card.querySelector('.coop-name').innerText;
       let url = telemetryUrls[coopId];
 
+      // Si el usuario de Clerk tiene una URL de panel específica configurada en su metadata, usar esa
+      if (window.Clerk && window.Clerk.user) {
+        const pMeta = window.Clerk.user.privateMetadata || {};
+        const pubMeta = window.Clerk.user.publicMetadata || {};
+        const unsMeta = window.Clerk.user.unsafeMetadata || {};
+        const customUrl = pMeta.tbDashboardUrl || pubMeta.tbDashboardUrl || unsMeta.tbDashboardUrl;
+        if (customUrl) {
+          url = customUrl;
+        }
+      }
+
       if (!url) return;
 
       // Desplegar el panel INMEDIATAMENTE al hacer clic
@@ -508,7 +519,7 @@ function initTelemetryEvents() {
       // Show loader and update title
       telemetryLoader.style.opacity = '1';
       telemetryLoader.style.pointerEvents = 'all';
-      telemetryLoader.innerHTML = '<div class="spinner"></div><p>Conectando de forma segura con el servidor de Telemedición...</p>';
+      telemetryLoader.innerHTML = '<div class="spinner"></div><p>Cargando panel de telemedición...</p>';
       activeCoopTitle.innerText = `Panel de Control - ${coopName}`;
 
       // Smooth scroll al panel desplegado
@@ -516,23 +527,11 @@ function initTelemetryEvents() {
         telemetryPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 100);
 
-      // Si es la cooperativa de ThingsBoard, obtener el token de seguridad dinámicamente
-      if (coopId === 'coop-b' || url.includes('thingsboard.cloud')) {
-        const { token, error } = await getTbToken();
+      // Si es una URL dinámica de ThingsBoard con backend, solicitar token si corresponde
+      if (url.includes('/dashboard/') && !url.includes('/shared/')) {
+        const { token } = await getTbToken();
         if (token) {
-          // Soporta token, accessToken y jwt_token para cualquier versión de ThingsBoard Cloud
-          url = `https://thingsboard.cloud/dashboard/${thingsboardDashboardId}?token=${token}&accessToken=${token}&jwt_token=${token}`;
-        } else {
-          // Si el token falló, alertar dentro del panel desplegado
-          telemetryLoader.innerHTML = `
-            <div style="text-align: center; color: #ff6b6b; padding: 20px;">
-              <i data-lucide="alert-triangle" style="width: 36px; height: 36px; margin-bottom: 8px;"></i>
-              <p style="font-weight: bold; margin-bottom: 6px;">Error de autenticación con ThingsBoard</p>
-              <p style="font-size: 0.85rem; color: var(--text-muted);">${error || 'Asegúrate de configurar TB_USERNAME, TB_PASSWORD y TB_BASE_URL en el panel de Vercel.'}</p>
-            </div>
-          `;
-          if (typeof lucide !== 'undefined') lucide.createIcons();
-          return;
+          url = `${url}?accessToken=${token}&token=${token}`;
         }
       }
 
