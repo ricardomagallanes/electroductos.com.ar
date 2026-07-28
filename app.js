@@ -463,45 +463,23 @@ function initMobileMenu() {
 
 // Función para obtener el token JWT de ThingsBoard desde /api/tb-token
 async function getTbToken() {
-  const tryEndpoints = [
-    '/api/tb-token',
-    '/api/tb-token.js',
-    'https://electroductos-com-ar.vercel.app/api/tb-token'
-  ];
+  try {
+    const res = await fetch('/api/tb-token');
+    const data = await res.json();
 
-  for (const endpoint of tryEndpoints) {
-    try {
-      const res = await fetch(endpoint);
-      if (!res.ok && res.status === 404) continue;
-
-      const rawText = await res.text();
-      // Si la respuesta es código JavaScript estático de GitHub Pages, continuar con el siguiente endpoint
-      if (rawText.trim().startsWith('module.exports') || rawText.trim().startsWith('export default')) {
-        continue;
-      }
-
-      let data;
-      try {
-        data = JSON.parse(rawText);
-      } catch (parseErr) {
-        continue;
-      }
-
-      if (!res.ok) {
-        console.warn('Error backend al solicitar token:', data);
-        return { token: null, error: data.error || 'Error de autenticación backend en Vercel.' };
-      }
-
-      return { token: data.token, error: null };
-    } catch (err) {
-      console.warn(`Falló la petición a ${endpoint}:`, err);
+    if (!res.ok) {
+      console.warn('Error backend al solicitar token:', data);
+      return { 
+        token: null, 
+        error: data.details ? `${data.error}: ${data.details}` : (data.error || 'Error de autenticación con ThingsBoard') 
+      };
     }
-  }
 
-  return {
-    token: null,
-    error: 'No se pudo obtener el token de ThingsBoard. Asegúrate de tener configuradas las variables en Vercel.'
-  };
+    return { token: data.token, error: null };
+  } catch (err) {
+    console.error('Error al conectar con /api/tb-token:', err);
+    return { token: null, error: 'No se pudo contactar con la API de autenticación.' };
+  }
 }
 
 // Telemetry Iframe Flow Events
