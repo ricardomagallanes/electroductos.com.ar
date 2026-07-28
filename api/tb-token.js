@@ -14,9 +14,8 @@ export default async function handler(req, res) {
 
     try {
         const baseUrl = process.env.TB_BASE_URL || 'https://thingsboard.cloud';
-        let apiKey = process.env.TB_API_KEY || null;
-        let username = process.env.TB_USERNAME || null;
-        let password = process.env.TB_PASSWORD || null;
+        // API Key por defecto (Ricardo Magallanes)
+        let apiKey = process.env.TB_API_KEY || 'tb_Q1KhKWF81TWsMbnFjNk61a2TMhE7oAMnCH6fEIikgKia_Of6lKyn2CZL4dr7oZlz_VW58xKEeBZ37KeOuMyEaQ';
 
         // Extraer token de sesión de Clerk si viene en la cabecera Authorization
         const authHeader = req.headers.authorization || req.headers.Authorization;
@@ -29,78 +28,58 @@ export default async function handler(req, res) {
                     const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
                     const userId = payload.sub;
 
-                    if (userId && process.env.CLERK_SECRET_KEY) {
+                    const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+                    if (userId && clerkSecretKey) {
                         const clerkRes = await fetch(`https://api.clerk.com/v1/users/${userId}`, {
                             headers: {
-                                'Authorization': `Bearer ${process.env.CLERK_SECRET_KEY}`,
+                                'Authorization': `Bearer ${clerkSecretKey}`,
                                 'Content-Type': 'application/json'
                             }
                         });
 
                         if (clerkRes.ok) {
                             const clerkUser = await clerkRes.json();
-                            const privateMeta = clerkUser.private_metadata || {};
-                            
-                            // Prioridad 1: API Key asignada al usuario en privateMetadata
-                            if (privateMeta.tbApiKey || privateMeta.apiKey) {
-                                apiKey = privateMeta.tbApiKey || privateMeta.apiKey;
-                            } 
-                            // Prioridad 2: Usuario y Contraseña en privateMetadata
-                            else if ((privateMeta.tbUsername || privateMeta.tb_username) && (privateMeta.tbPassword || privateMeta.tb_password)) {
-                                username = privateMeta.tbUsername || privateMeta.tb_username;
-                                password = privateMeta.tbPassword || privateMeta.tb_password;
+                            const pMeta = clerkUser.private_metadata || {};
+                            const pubMeta = clerkUser.public_metadata || {};
+                            const unsMeta = clerkUser.unsafe_metadata || {};
+
+                            const foundKey = pMeta.tbApiKey || pMeta.apiKey || pubMeta.tbApiKey || pubMeta.apiKey || unsMeta.tbApiKey || unsMeta.apiKey;
+                            if (foundKey) {
+                                apiKey = foundKey;
                             }
                         }
                     }
                 }
             } catch (clerkErr) {
-                console.warn('Error al verificar sesión de Clerk en backend:', clerkErr);
+                console.warn('Error al verificar sesión de Clerk:', clerkErr);
             }
         }
 
-        // Si hay un API Key disponible (del usuario en Clerk o de Vercel)
-        if (apiKey) {
-            // Verificar validez del API Key llamando a /api/auth/user en ThingsBoard
-            const userCheckRes = await fetch(`${baseUrl}/api/auth/user`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Authorization': `ApiKey ${apiKey}`
-                }
+        // ÚNICA LÓGICA DE AUTENTICACIÓN: Validar API Key contra ThingsBoard /api/auth/user
+        const userCheckRes = await fetch(`${baseUrl}/api/auth/user`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Authorization': `ApiKey ${apiKey}`
+            }
+        });
+
+        if (!userCheckRes.ok) {
+            const errData = await userCheckRes.text().catch(() => '');
+            return res.status(401).json({ 
+                error: 'El API Key de ThingsBoard fue rechazado', 
+                details: errData 
             });
-
-            if (userCheckRes.ok) {
-                // Si el API Key es válido, se retorna como token de acceso directo para el iframe
-                return res.status(200).json({ token: apiKey });
-            } else {
-                console.warn('API Key no válida o rechazada por ThingsBoard');
-            }
         }
 
-        // Si no hay API Key pero hay Usuario y Contraseña
-        if (username && password) {
-            const tbResponse = await fetch(`${baseUrl}/api/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            });
+        const userData = await userCheckRes.json();
 
-            if (!tbResponse.ok) {
-                const errData = await tbResponse.text().catch(() => '');
-                return res.status(401).json({ error: 'Respuesta no autorizada de ThingsBoard', details: errData });
-            }
-
-            const data = await tbResponse.json();
-            return res.status(200).json({ token: data.token });
-        }
-
-        return res.status(500).json({ 
-            error: 'No se encontraron credenciales válidas (tbApiKey o usuario/contraseña) en Clerk ni en Vercel.' 
+        // Devolver única y exclusivamente el API Key autenticado
+        return res.status(200).json({ 
+            token: apiKey, 
+            user: userData.email || userData.name 
         });
 
     } catch (error) {
-        return res.status(500).json({ error: 'Error de servidor backend', message: error.message });
+        return res.status(500).json({ error: 'Error del servidor backend', message: error.message });
     }
 }
