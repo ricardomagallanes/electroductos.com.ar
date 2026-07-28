@@ -2,7 +2,7 @@ export default async function handler(req, res) {
     // Permitir CORS para solicitudes desde GitHub Pages o cualquier dominio
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
     res.setHeader(
         'Access-Control-Allow-Headers',
         'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
@@ -13,23 +13,38 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { TB_BASE_URL, TB_USERNAME, TB_PASSWORD } = process.env;
+        let username = process.env.TB_USERNAME;
+        let password = process.env.TB_PASSWORD;
 
-        if (!TB_BASE_URL || !TB_USERNAME || !TB_PASSWORD) {
+        // Si el frontend envía credenciales de un usuario específico (ej. desde metadata de Clerk)
+        if (req.body) {
+            let body = req.body;
+            if (typeof body === 'string') {
+                try { body = JSON.parse(body); } catch(e){}
+            }
+            if (body.username && body.password) {
+                username = body.username;
+                password = body.password;
+            }
+        }
+
+        const baseUrl = process.env.TB_BASE_URL || 'https://thingsboard.cloud';
+
+        if (!username || !password) {
             return res.status(500).json({ 
-                error: 'Faltan configurar las variables de entorno en Vercel (TB_BASE_URL, TB_USERNAME, TB_PASSWORD).' 
+                error: 'No hay credenciales de ThingsBoard disponibles ni en el usuario ni en las variables de entorno.' 
             });
         }
 
-        const tbResponse = await fetch(`${TB_BASE_URL}/api/auth/login`, {
+        const tbResponse = await fetch(`${baseUrl}/api/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
             body: JSON.stringify({
-                username: TB_USERNAME,
-                password: TB_PASSWORD
+                username: username,
+                password: password
             })
         });
 

@@ -464,7 +464,28 @@ function initMobileMenu() {
 // Función para obtener el token JWT de ThingsBoard desde /api/tb-token
 async function getTbToken() {
   try {
-    const res = await fetch('/api/tb-token');
+    let fetchOptions = { method: 'GET' };
+
+    // Extraer metadata del usuario de Clerk si está autenticado
+    if (window.Clerk && window.Clerk.user) {
+      const metadata = {
+        ...(window.Clerk.user.publicMetadata || {}),
+        ...(window.Clerk.user.unsafeMetadata || {})
+      };
+
+      const tbUsername = metadata.tbUsername || metadata.tb_username || metadata.username;
+      const tbPassword = metadata.tbPassword || metadata.tb_password || metadata.password;
+
+      if (tbUsername && tbPassword) {
+        fetchOptions = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: tbUsername, password: tbPassword })
+        };
+      }
+    }
+
+    const res = await fetch('/api/tb-token', fetchOptions);
     const data = await res.json();
 
     if (!res.ok) {
