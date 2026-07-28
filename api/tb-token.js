@@ -14,8 +14,12 @@ export default async function handler(req, res) {
 
     try {
         const baseUrl = process.env.TB_BASE_URL || 'https://thingsboard.cloud';
-        // API Key por defecto (Ricardo Magallanes)
-        let apiKey = process.env.TB_API_KEY || 'tb_Q1KhKWF81TWsMbnFjNk61a2TMhE7oAMnCH6fEIikgKia_Of6lKyn2CZL4dr7oZlz_VW58xKEeBZ37KeOuMyEaQ';
+        const adminApiKey = process.env.TB_ADMIN_API_KEY || process.env.TB_API_KEY;
+        
+        let targetUserId = 'f48c29f0-8a96-11f1-a40e-2ba7ae4918b3'; // ID por defecto de Ricardo Magallanes
+        let userApiKey = null;
+        let username = process.env.TB_USERNAME;
+        let password = process.env.TB_PASSWORD;
 
         // Extraer token de sesión de Clerk si viene en la cabecera Authorization
         const authHeader = req.headers.authorization || req.headers.Authorization;
@@ -43,9 +47,14 @@ export default async function handler(req, res) {
                             const pubMeta = clerkUser.public_metadata || {};
                             const unsMeta = clerkUser.unsafe_metadata || {};
 
-                            const foundKey = pMeta.tbApiKey || pMeta.apiKey || pubMeta.tbApiKey || pubMeta.apiKey || unsMeta.tbApiKey || unsMeta.apiKey;
-                            if (foundKey) {
-                                apiKey = foundKey;
+                            const foundUserId = pMeta.tbUserId || pMeta.tb_user_id || pubMeta.tbUserId || unsMeta.tbUserId;
+                            if (foundUserId) {
+                                targetUserId = foundUserId;
+                            }
+                            userApiKey = pMeta.tbApiKey || pMeta.apiKey || pubMeta.tbApiKey || unsMeta.tbApiKey;
+                            if (pMeta.tbUsername && pMeta.tbPassword) {
+                                username = pMeta.tbUsername;
+                                password = pMeta.tbPassword;
                             }
                         }
                     }
@@ -55,28 +64,43 @@ export default async function handler(req, res) {
             }
         }
 
-        // ÚNICA LÓGICA DE AUTENTICACIÓN: Validar API Key contra ThingsBoard /api/auth/user
-        const userCheckRes = await fetch(`${baseUrl}/api/auth/user`, {
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Authorization': `ApiKey ${apiKey}`
-            }
-        });
-
-        if (!userCheckRes.ok) {
-            const errData = await userCheckRes.text().catch(() => '');
-            return res.status(401).json({ 
-                error: 'El API Key de ThingsBoard fue rechazado', 
-                details: errData 
+        // Método 1: Obtener el token JWT del usuario objetivo mediante Impersonation usando Admin API Key
+        const apiKeyToUse = adminApiKey || userApiKey;
+        if (targetUserId && apiKeyToUse) {
+            const impersonateRes = await fetch(`${baseUrl}/api/user/${targetUserId}/token`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Authorization': `ApiKey ${apiKeyToUse}`
+                }
             });
+
+            if (impersonateRes.ok) {
+                const tokenData = await impersonateRes.json();
+                if (tokenData.token) {
+                    return res.status(200).json({ token: tokenData.token });
+                }
+            }
         }
 
-        const userData = await userCheckRes.json();
+        // Método 2: Login tradicional por Usuario y Contraseña para obtener Token JWT
+        if (username && password) {
+            const tbResponse = await fetch(`${baseUrl}/api/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
 
-        // Devolver única y exclusivamente el API Key autenticado
-        return res.status(200).json({ 
-            token: apiKey, 
-            user: userData.email || userData.name 
+            if (tbResponse.ok) {
+                const data = await tbResponse.json();
+                return res.status(200).json({ token: data.token });
+            }
+        }
+
+        return res.status(401).json({ 
+            error: 'No se pudo obtener un token JWT de ThingsBoard. Asegúrate de configurar TB_ADMIN_API_KEY en Vercel (API Key del Administrador del Tenant).' 
         });
 
     } catch (error) {
