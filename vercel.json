@@ -1,9 +1,23 @@
 {
-  "cleanUrls": true,
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/api/tb-token",
-      "destination": "/api/tb-token.js"
+      "src": "api/tb-token.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "!(api/**)",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/tb-token",
+      "dest": "/api/tb-token.js"
+    },
+    {
+      "src": "/api/tb-token.js",
+      "dest": "/api/tb-token.js"
     }
   ]
 }

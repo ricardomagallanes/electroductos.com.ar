@@ -464,19 +464,31 @@ function initMobileMenu() {
 // Función para obtener el token JWT de ThingsBoard desde /api/tb-token
 async function getTbToken() {
   try {
-    let res = await fetch('/api/tb-token');
-    if (res.status === 404) {
-      res = await fetch('/api/tb-token.js');
+    // Probar primero /api/tb-token.js y luego /api/tb-token
+    let res = await fetch('/api/tb-token.js');
+    if (!res.ok && res.status === 404) {
+      res = await fetch('/api/tb-token');
     }
     
     if (res.status === 404) {
       return { 
         token: null, 
-        error: 'El endpoint /api/tb-token no está disponible (status 404). Si estás en desarrollo local, debes usar "vercel dev" o publicar en Vercel para ejecutar Serverless Functions.' 
+        error: 'El endpoint /api/tb-token.js no está disponible (status 404).' 
       };
     }
 
-    const data = await res.json();
+    const rawText = await res.text();
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch (parseErr) {
+      console.error('Respuesta no válida como JSON:', rawText);
+      return { 
+        token: null, 
+        error: 'La respuesta del servidor no es un JSON válido.' 
+      };
+    }
+
     if (!res.ok) {
       console.warn('Error backend al solicitar token:', data);
       return { token: null, error: data.error || 'Error de autenticación backend' };
