@@ -1,5 +1,10 @@
 {
-  "cleanUrls": true,
+  "functions": {
+    "api/tb-token.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
     {
       "source": "/api/tb-token",
