@@ -69,7 +69,7 @@ export default async function handler(req, res) {
             });
 
             if (userCheckRes.ok) {
-                // Si el API Key es válido, se retorna como token de acceso directo
+                // Si el API Key es válido, se retorna como token de acceso directo para el iframe
                 return res.status(200).json({ token: apiKey });
             } else {
                 console.warn('API Key no válida o rechazada por ThingsBoard');
