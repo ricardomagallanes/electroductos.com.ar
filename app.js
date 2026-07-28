@@ -461,14 +461,10 @@ function initMobileMenu() {
   });
 }
 
-// Función para obtener el token JWT de ThingsBoard desde /api/tb-token
+// Función para obtener el token JWT de ThingsBoard desde /api/tb-token.js
 async function getTbToken() {
   try {
-    // Probar primero /api/tb-token.js y luego /api/tb-token
-    let res = await fetch('/api/tb-token.js');
-    if (!res.ok && res.status === 404) {
-      res = await fetch('/api/tb-token');
-    }
+    const res = await fetch('/api/tb-token.js');
     
     if (res.status === 404) {
       return { 
@@ -482,10 +478,10 @@ async function getTbToken() {
     try {
       data = JSON.parse(rawText);
     } catch (parseErr) {
-      console.error('Respuesta no válida como JSON:', rawText);
+      console.error('Respuesta no válida como JSON de /api/tb-token.js:', rawText);
       return { 
         token: null, 
-        error: 'La respuesta del servidor no es un JSON válido.' 
+        error: 'La respuesta de /api/tb-token.js no es un JSON válido (¿falta procesar como Serverless Function en Vercel?).' 
       };
     }
 
@@ -495,7 +491,7 @@ async function getTbToken() {
     }
     return { token: data.token, error: null };
   } catch (err) {
-    console.error('Error al conectar con /api/tb-token:', err);
+    console.error('Error al conectar con /api/tb-token.js:', err);
     return { token: null, error: 'No se pudo contactar con la API de autenticación.' };
   }
 }
