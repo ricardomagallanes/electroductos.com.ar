@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     try {
         if (!process.env.TB_BASE_URL || !process.env.TB_USERNAME || !process.env.TB_PASSWORD) {
             return res.status(500).json({ 
@@ -29,4 +29,4 @@ export default async function handler(req, res) {
     } catch (error) {
         return res.status(500).json({ error: 'Error de servidor backend', message: error.message });
     }
-}
+};
