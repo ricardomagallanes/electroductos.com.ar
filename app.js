@@ -463,41 +463,45 @@ function initMobileMenu() {
 
 // Función para obtener el token JWT de ThingsBoard desde /api/tb-token
 async function getTbToken() {
-  try {
-    let res = await fetch('/api/tb-token');
-    
-    if (res.status === 404) {
-      res = await fetch('/api/tb-token.js');
-    }
+  const tryEndpoints = [
+    '/api/tb-token',
+    '/api/tb-token.js',
+    'https://electroductos-com-ar.vercel.app/api/tb-token'
+  ];
 
-    if (res.status === 404) {
-      return { 
-        token: null, 
-        error: 'El servidor Vercel devolvió 404 Not Found en /api/tb-token.' 
-      };
-    }
-
-    const rawText = await res.text();
-    let data;
+  for (const endpoint of tryEndpoints) {
     try {
-      data = JSON.parse(rawText);
-    } catch (parseErr) {
-      console.error('Respuesta no válida como JSON:', rawText);
-      return { 
-        token: null, 
-        error: 'La respuesta de la API no es un JSON válido.' 
-      };
-    }
+      const res = await fetch(endpoint);
+      if (!res.ok && res.status === 404) continue;
 
-    if (!res.ok) {
-      console.warn('Error backend al solicitar token:', data);
-      return { token: null, error: data.error || 'Error de autenticación backend' };
+      const rawText = await res.text();
+      // Si la respuesta es código JavaScript estático de GitHub Pages, continuar con el siguiente endpoint
+      if (rawText.trim().startsWith('module.exports') || rawText.trim().startsWith('export default')) {
+        continue;
+      }
+
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch (parseErr) {
+        continue;
+      }
+
+      if (!res.ok) {
+        console.warn('Error backend al solicitar token:', data);
+        return { token: null, error: data.error || 'Error de autenticación backend en Vercel.' };
+      }
+
+      return { token: data.token, error: null };
+    } catch (err) {
+      console.warn(`Falló la petición a ${endpoint}:`, err);
     }
-    return { token: data.token, error: null };
-  } catch (err) {
-    console.error('Error al conectar con /api/tb-token:', err);
-    return { token: null, error: 'No se pudo contactar con la API de autenticación.' };
   }
+
+  return {
+    token: null,
+    error: 'No se pudo obtener el token de ThingsBoard. Asegúrate de tener configuradas las variables en Vercel.'
+  };
 }
 
 // Telemetry Iframe Flow Events
