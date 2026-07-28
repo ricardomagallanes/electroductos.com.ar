@@ -465,12 +465,15 @@ function initMobileMenu() {
 async function getTbToken() {
   try {
     const res = await fetch('/api/tb-token');
-    if (!res.ok) return null;
     const data = await res.json();
-    return data.token || null;
+    if (!res.ok) {
+      console.warn('Error backend al solicitar token:', data);
+      return { token: null, error: data.error || 'Error de autenticación backend' };
+    }
+    return { token: data.token, error: null };
   } catch (err) {
-    console.error('Error al conectar con el backend /api/tb-token:', err);
-    return null;
+    console.error('Error al conectar con /api/tb-token:', err);
+    return { token: null, error: 'No se pudo contactar con la API de autenticación.' };
   }
 }
 
@@ -487,16 +490,26 @@ function initTelemetryEvents() {
       // Show loader and update title
       telemetryLoader.style.opacity = '1';
       telemetryLoader.style.pointerEvents = 'all';
+      telemetryLoader.innerHTML = '<div class="spinner"></div><p>Conectando de forma segura con el servidor de Telemedición...</p>';
       activeCoopTitle.innerText = `Panel de Control - ${coopName}`;
 
       // Si es la cooperativa de ThingsBoard, obtener el token de seguridad dinámicamente
       if (coopId === 'coop-b' || url.includes('thingsboard.cloud')) {
-        const token = await getTbToken();
+        const { token, error } = await getTbToken();
         if (token) {
-          url = `https://thingsboard.cloud/dashboards/${thingsboardDashboardId}?jwt_token=${token}`;
+          // ThingsBoard JWT token dashboard URL (probamos primero /dashboard/ y si no /dashboards/)
+          url = `https://thingsboard.cloud/dashboard/${thingsboardDashboardId}?jwt_token=${token}`;
         } else {
-          // Si falla o estamos en desarrollo local sin backend, fallback a URL accesible
-          url = `https://thingsboard.cloud/dashboards/${thingsboardDashboardId}`;
+          // Si el token falló, alertar y no cargar pantalla de login en iframe
+          telemetryLoader.innerHTML = `
+            <div style="text-align: center; color: #ff6b6b; padding: 20px;">
+              <i data-lucide="alert-triangle" style="width: 36px; height: 36px; margin-bottom: 8px;"></i>
+              <p style="font-weight: bold; margin-bottom: 6px;">Error de autenticación con ThingsBoard</p>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">${error || 'Asegúrate de configurar TB_USERNAME, TB_PASSWORD y TB_BASE_URL en el panel de Vercel.'}</p>
+            </div>
+          `;
+          if (typeof lucide !== 'undefined') lucide.createIcons();
+          return;
         }
       }
 
