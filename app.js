@@ -464,7 +464,18 @@ function initMobileMenu() {
 // Función para obtener el token JWT de ThingsBoard desde /api/tb-token
 async function getTbToken() {
   try {
-    const res = await fetch('/api/tb-token');
+    let res = await fetch('/api/tb-token');
+    if (res.status === 404) {
+      res = await fetch('/api/tb-token.js');
+    }
+    
+    if (res.status === 404) {
+      return { 
+        token: null, 
+        error: 'El endpoint /api/tb-token no está disponible (status 404). Si estás en desarrollo local, debes usar "vercel dev" o publicar en Vercel para ejecutar Serverless Functions.' 
+      };
+    }
+
     const data = await res.json();
     if (!res.ok) {
       console.warn('Error backend al solicitar token:', data);

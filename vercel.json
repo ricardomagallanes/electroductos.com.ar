@@ -1,0 +1,9 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/tb-token",
+      "destination": "/api/tb-token.js"
+    }
+  ]
+}
