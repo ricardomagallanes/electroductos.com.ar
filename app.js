@@ -464,28 +464,17 @@ function initMobileMenu() {
 // Función para obtener el token JWT de ThingsBoard desde /api/tb-token
 async function getTbToken() {
   try {
-    let fetchOptions = { method: 'GET' };
+    const headers = {};
 
-    // Extraer metadata del usuario de Clerk si está autenticado
-    if (window.Clerk && window.Clerk.user) {
-      const metadata = {
-        ...(window.Clerk.user.publicMetadata || {}),
-        ...(window.Clerk.user.unsafeMetadata || {})
-      };
-
-      const tbUsername = metadata.tbUsername || metadata.tb_username || metadata.username;
-      const tbPassword = metadata.tbPassword || metadata.tb_password || metadata.password;
-
-      if (tbUsername && tbPassword) {
-        fetchOptions = {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: tbUsername, password: tbPassword })
-        };
+    // Si el usuario está autenticado en Clerk, enviar su Session Token en la cabecera de forma ultra segura
+    if (window.Clerk && window.Clerk.session) {
+      const clerkToken = await window.Clerk.session.getToken();
+      if (clerkToken) {
+        headers['Authorization'] = `Bearer ${clerkToken}`;
       }
     }
 
-    const res = await fetch('/api/tb-token', fetchOptions);
+    const res = await fetch('/api/tb-token', { method: 'GET', headers });
     const data = await res.json();
 
     if (!res.ok) {
