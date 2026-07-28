@@ -467,9 +467,13 @@ async function getTbToken() {
     let res = await fetch('/api/tb-token');
     
     if (res.status === 404) {
+      res = await fetch('/api/tb-token.js');
+    }
+
+    if (res.status === 404) {
       return { 
         token: null, 
-        error: 'El endpoint /api/tb-token no está disponible (status 404). Revisa el despliegue en Vercel.' 
+        error: 'El servidor Vercel devolvió 404 Not Found en /api/tb-token.' 
       };
     }
 
@@ -481,7 +485,7 @@ async function getTbToken() {
       console.error('Respuesta no válida como JSON:', rawText);
       return { 
         token: null, 
-        error: 'La respuesta de /api/tb-token no es un JSON válido.' 
+        error: 'La respuesta de la API no es un JSON válido.' 
       };
     }
 
