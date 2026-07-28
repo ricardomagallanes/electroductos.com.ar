@@ -520,8 +520,8 @@ function initTelemetryEvents() {
       if (coopId === 'coop-b' || url.includes('thingsboard.cloud')) {
         const { token, error } = await getTbToken();
         if (token) {
-          // Soporta tanto accessToken como jwt_token para cualquier versión de ThingsBoard Cloud
-          url = `https://thingsboard.cloud/dashboard/${thingsboardDashboardId}?accessToken=${token}&jwt_token=${token}`;
+          // Soporta token, accessToken y jwt_token para cualquier versión de ThingsBoard Cloud
+          url = `https://thingsboard.cloud/dashboard/${thingsboardDashboardId}?token=${token}&accessToken=${token}&jwt_token=${token}`;
         } else {
           // Si el token falló, alertar dentro del panel desplegado
           telemetryLoader.innerHTML = `
