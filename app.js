@@ -492,11 +492,19 @@ function initTelemetryEvents() {
 
       if (!url) return;
 
+      // Desplegar el panel INMEDIATAMENTE al hacer clic
+      telemetryPanel.classList.add('active');
+
       // Show loader and update title
       telemetryLoader.style.opacity = '1';
       telemetryLoader.style.pointerEvents = 'all';
       telemetryLoader.innerHTML = '<div class="spinner"></div><p>Conectando de forma segura con el servidor de Telemedición...</p>';
       activeCoopTitle.innerText = `Panel de Control - ${coopName}`;
+
+      // Smooth scroll al panel desplegado
+      setTimeout(() => {
+        telemetryPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
 
       // Si es la cooperativa de ThingsBoard, obtener el token de seguridad dinámicamente
       if (coopId === 'coop-b' || url.includes('thingsboard.cloud')) {
@@ -505,7 +513,7 @@ function initTelemetryEvents() {
           // Soporta tanto accessToken como jwt_token para cualquier versión de ThingsBoard Cloud
           url = `https://thingsboard.cloud/dashboard/${thingsboardDashboardId}?accessToken=${token}&jwt_token=${token}`;
         } else {
-          // Si el token falló, alertar y no cargar pantalla de login en iframe
+          // Si el token falló, alertar dentro del panel desplegado
           telemetryLoader.innerHTML = `
             <div style="text-align: center; color: #ff6b6b; padding: 20px;">
               <i data-lucide="alert-triangle" style="width: 36px; height: 36px; margin-bottom: 8px;"></i>
@@ -520,14 +528,6 @@ function initTelemetryEvents() {
 
       // Update iframe source
       telemetryIframe.src = url;
-
-      // Open panel
-      telemetryPanel.classList.add('active');
-
-      // Smooth scroll to panel
-      setTimeout(() => {
-        telemetryPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
     });
   });
 
