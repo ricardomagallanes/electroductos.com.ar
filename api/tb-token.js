@@ -18,9 +18,10 @@ export default async function handler(req, res) {
         // Credenciales predeterminadas de entorno
         const envUser = process.env.TB_USERNAME || process.env.TB_ADMIN_USER || process.env.TB_USER;
         const envPass = process.env.TB_PASSWORD || process.env.TB_ADMIN_PASS || process.env.TB_ADMIN_PASSWORD;
-        const envTargetUserId = process.env.TB_USER_ID || process.env.TB_TARGET_USER_ID || 'f48c29f0-8a96-11f1-a40e-2ba7ae4918b3';
+        const envTargetUserId = process.env.TB_USER_ID || process.env.TB_TARGET_USER_ID || '08ef8780-8c94-11f1-8d8a-a962a2e26a4f';
         
         let targetUserId = null;
+        let userEmail = null;
         let userTbUsername = null;
         let userTbPassword = null;
 
@@ -34,6 +35,7 @@ export default async function handler(req, res) {
                 if (parts.length === 3) {
                     const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
                     const userId = payload.sub;
+                    userEmail = payload.email || payload.primary_email || null;
 
                     const clerkSecretKey = process.env.CLERK_SECRET_KEY;
                     if (userId && clerkSecretKey) {
@@ -53,6 +55,10 @@ export default async function handler(req, res) {
                             targetUserId = pMeta.tbUserId || pMeta.tb_user_id || pubMeta.tbUserId || unsMeta.tbUserId || null;
                             userTbUsername = pMeta.tbUsername || pMeta.tbUser || pubMeta.tbUsername || unsMeta.tbUsername || null;
                             userTbPassword = pMeta.tbPassword || pMeta.tbPass || pubMeta.tbPassword || unsMeta.tbPassword || null;
+                            
+                            if (!userEmail && clerkUser.email_addresses && clerkUser.email_addresses.length > 0) {
+                                userEmail = clerkUser.email_addresses[0].email_address;
+                            }
                         }
                     }
                 }
@@ -60,9 +66,6 @@ export default async function handler(req, res) {
                 console.warn('Error al verificar sesión de Clerk:', clerkErr);
             }
         }
-
-        // Si no se definió un ID de usuario específico en la metadata de Clerk, usar el ID del cliente por defecto
-        const finalTargetUserId = targetUserId || envTargetUserId;
 
         // Si el usuario en Clerk tiene su propio usuario/contraseña de TB en metadata, hacer login directo
         if (userTbUsername && userTbPassword) {
@@ -114,7 +117,31 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'ThingsBoard no devolvió un token de administrador válido.' });
         }
 
-        // 2. Obtener el Token JWT del Cliente (Customer) mediante Impersonation (/api/user/{finalTargetUserId}/token)
+        // 2. Buscar dinámicamente el User ID del usuario por su email si no se proveyó targetUserId específico
+        let resolvedUserId = targetUserId;
+        if (!resolvedUserId && userEmail) {
+            try {
+                const userSearchRes = await fetch(`${baseUrl}/api/user?email=${encodeURIComponent(userEmail)}`, {
+                    headers: {
+                        'X-Authorization': `Bearer ${adminData.token}`,
+                        'ngrok-skip-browser-warning': 'true'
+                    }
+                });
+
+                if (userSearchRes.ok) {
+                    const foundUser = await userSearchRes.json();
+                    if (foundUser && foundUser.id && foundUser.id.id) {
+                        resolvedUserId = foundUser.id.id;
+                    }
+                }
+            } catch (searchErr) {
+                console.warn('Error al buscar usuario por email en TB:', searchErr);
+            }
+        }
+
+        const finalTargetUserId = resolvedUserId || envTargetUserId;
+
+        // 3. Obtener el Token JWT del Cliente (Customer) mediante Impersonation (/api/user/{finalTargetUserId}/token)
         if (finalTargetUserId) {
             const impersonateRes = await fetch(`${baseUrl}/api/user/${finalTargetUserId}/token`, {
                 headers: {
@@ -131,7 +158,7 @@ export default async function handler(req, res) {
                 }
             } else {
                 const impErrText = await impersonateRes.text().catch(() => '');
-                console.warn(`No se pudo obtener token para User ID ${finalTargetUserId}, devolviendo token de admin:`, impErrText);
+                console.warn(`No se pudo obtener token para User ID ${finalTargetUserId}:`, impErrText);
             }
         }
 
