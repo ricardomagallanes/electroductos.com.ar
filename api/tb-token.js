@@ -18,6 +18,7 @@ export default async function handler(req, res) {
         // Credenciales predeterminadas de entorno
         const envUser = process.env.TB_USERNAME || process.env.TB_ADMIN_USER || process.env.TB_USER;
         const envPass = process.env.TB_PASSWORD || process.env.TB_ADMIN_PASS || process.env.TB_ADMIN_PASSWORD;
+        const envTargetUserId = process.env.TB_USER_ID || process.env.TB_TARGET_USER_ID || 'f48c29f0-8a96-11f1-a40e-2ba7ae4918b3';
         
         let targetUserId = null;
         let userTbUsername = null;
@@ -60,60 +61,82 @@ export default async function handler(req, res) {
             }
         }
 
-        // Determinar usuario y contraseña a utilizar (Metadata del usuario en Clerk o Variables de entorno)
-        const usernameToUse = userTbUsername || envUser;
-        const passwordToUse = userTbPassword || envPass;
+        // Si no se definió un ID de usuario específico en la metadata de Clerk, usar el ID del cliente por defecto
+        const finalTargetUserId = targetUserId || envTargetUserId;
 
-        if (!usernameToUse || !passwordToUse) {
+        // Si el usuario en Clerk tiene su propio usuario/contraseña de TB en metadata, hacer login directo
+        if (userTbUsername && userTbPassword) {
+            const directLoginRes = await fetch(`${baseUrl}/api/auth/login`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                },
+                body: JSON.stringify({ username: userTbUsername, password: userTbPassword })
+            });
+
+            if (directLoginRes.ok) {
+                const directData = await directLoginRes.json();
+                if (directData && directData.token) {
+                    return res.status(200).json({ token: directData.token });
+                }
+            }
+        }
+
+        // De lo contrario, usar las credenciales del Administrador de entorno para autenticarse e impersonar al usuario (Customer)
+        if (!envUser || !envPass) {
             return res.status(500).json({ 
                 error: 'Falta configurar TB_USERNAME y TB_PASSWORD en el panel de Vercel (o en los metadatos del usuario de Clerk).' 
             });
         }
 
-        // Realizar autenticación HTTP POST en /api/auth/login de ThingsBoard
-        const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
+        // 1. Login del Administrador
+        const adminLoginRes = await fetch(`${baseUrl}/api/auth/login`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': 'true'
             },
-            body: JSON.stringify({ username: usernameToUse, password: passwordToUse })
+            body: JSON.stringify({ username: envUser, password: envPass })
         });
 
-        if (!loginRes.ok) {
-            const errData = await loginRes.text().catch(() => '');
+        if (!adminLoginRes.ok) {
+            const errData = await adminLoginRes.text().catch(() => '');
             return res.status(401).json({ 
-                error: `Error al autenticar con ThingsBoard (/api/auth/login para usuario '${usernameToUse}')`, 
+                error: `Error al autenticar admin con ThingsBoard (/api/auth/login para '${envUser}')`, 
                 details: errData 
             });
         }
 
-        const loginData = await loginRes.json();
+        const adminData = await adminLoginRes.json();
 
-        if (loginData && loginData.token) {
-            // Si las credenciales eran de Admin y se requiere obtener el token de otro targetUserId específico
-            if (targetUserId) {
-                const impersonateRes = await fetch(`${baseUrl}/api/user/${targetUserId}/token`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Authorization': `Bearer ${loginData.token}`,
-                        'ngrok-skip-browser-warning': 'true'
-                    }
-                });
-
-                if (impersonateRes.ok) {
-                    const impData = await impersonateRes.json();
-                    if (impData && impData.token) {
-                        return res.status(200).json({ token: impData.token });
-                    }
-                }
-            }
-
-            // Retornar el token JWT devuelto por /api/auth/login
-            return res.status(200).json({ token: loginData.token });
-        } else {
-            return res.status(500).json({ error: 'ThingsBoard no devolvió un token JWT válido.' });
+        if (!adminData || !adminData.token) {
+            return res.status(500).json({ error: 'ThingsBoard no devolvió un token de administrador válido.' });
         }
+
+        // 2. Obtener el Token JWT del Cliente (Customer) mediante Impersonation (/api/user/{finalTargetUserId}/token)
+        if (finalTargetUserId) {
+            const impersonateRes = await fetch(`${baseUrl}/api/user/${finalTargetUserId}/token`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Authorization': `Bearer ${adminData.token}`,
+                    'ngrok-skip-browser-warning': 'true'
+                }
+            });
+
+            if (impersonateRes.ok) {
+                const impData = await impersonateRes.json();
+                if (impData && impData.token) {
+                    return res.status(200).json({ token: impData.token });
+                }
+            } else {
+                const impErrText = await impersonateRes.text().catch(() => '');
+                console.warn(`No se pudo obtener token para User ID ${finalTargetUserId}, devolviendo token de admin:`, impErrText);
+            }
+        }
+
+        // Fallback: retornar token de admin si no se pudo impersonar
+        return res.status(200).json({ token: adminData.token });
 
     } catch (error) {
         return res.status(500).json({ error: 'Error del servidor backend', message: error.message });
