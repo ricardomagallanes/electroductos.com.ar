@@ -530,10 +530,18 @@ function initTelemetryEvents() {
       // Si es una URL de ThingsBoard (Cloud o instancia expuesta) y no tiene publicId explícito, adjuntar el token JWT del usuario
       const isThingsBoard = url.includes('thingsboard') || url.includes('pinggy.net') || url.includes('ngrok-free.dev') || url.includes('/dashboard/');
       if (isThingsBoard && !url.includes('publicId=')) {
-        const { token } = await getTbToken();
+        const { token, error } = await getTbToken();
         if (token) {
           const connector = url.includes('?') ? '&' : '?';
           url = `${url}${connector}accessToken=${token}&token=${token}&storeToken=true&_t=${Date.now()}`;
+        } else {
+          // Si no hay token del usuario, NO cargar el iframe sin token (para evitar cargar el localStorage del Admin)
+          telemetryLoader.style.opacity = '1';
+          telemetryLoader.style.pointerEvents = 'all';
+          telemetryLoader.innerHTML = `<div style="text-align: center; padding: 20px;"><i data-lucide="shield-alert" style="width: 48px; height: 48px; color: #ef4444; margin-bottom: 12px;"></i><p style="color: #f87171; font-weight: 600; font-size: 1rem; margin-bottom: 8px;">Sin vinculación con ThingsBoard</p><p style="color: #9ca3af; font-size: 0.85rem;">${error || 'Configura el tbUserId en la private_metadata de Clerk o iguala el email en ThingsBoard.'}</p></div>`;
+          if (typeof lucide !== 'undefined') lucide.createIcons();
+          telemetryIframe.src = 'about:blank';
+          return;
         }
       }
 
