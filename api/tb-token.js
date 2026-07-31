@@ -15,15 +15,17 @@ export default async function handler(req, res) {
     try {
         const baseUrl = (process.env.TB_BASE_URL || 'https://thingsboard.cloud').replace(/\/+$/, '');
         
-        // Credenciales predeterminadas de entorno
+        // Credenciales predeterminadas de administrador en entorno Vercel
         const envUser = process.env.TB_USERNAME || process.env.TB_ADMIN_USER || process.env.TB_USER;
         const envPass = process.env.TB_PASSWORD || process.env.TB_ADMIN_PASS || process.env.TB_ADMIN_PASSWORD;
-        const envTargetUserId = process.env.TB_USER_ID || process.env.TB_TARGET_USER_ID || '08ef8780-8c94-11f1-8d8a-a962a2e26a4f';
+        const envDefaultUserId = process.env.TB_USER_ID || process.env.TB_TARGET_USER_ID || null;
         
-        let targetUserId = null;
+        let clerkUserId = null;
         let userEmail = null;
+        let targetUserId = null;
         let userTbUsername = null;
         let userTbPassword = null;
+        let userStaticToken = null;
 
         // Extraer datos del usuario en Clerk si se envía el token Bearer en Authorization
         const authHeader = req.headers.authorization || req.headers.Authorization;
@@ -34,12 +36,23 @@ export default async function handler(req, res) {
                 const parts = sessionToken.split('.');
                 if (parts.length === 3) {
                     const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
-                    const userId = payload.sub;
-                    userEmail = payload.email || payload.primary_email || null;
+                    clerkUserId = payload.sub;
+                    userEmail = payload.email || payload.primary_email || (payload.email_addresses && payload.email_addresses[0]) || null;
 
+                    // 1. Extraer metadata directamente del payload del JWT de Clerk (si está configurada la claim)
+                    const jwtPMeta = payload.private_metadata || payload.privateMetadata || {};
+                    const jwtPubMeta = payload.public_metadata || payload.publicMetadata || {};
+                    const jwtUnsMeta = payload.unsafe_metadata || payload.unsafeMetadata || payload.user_metadata || {};
+
+                    targetUserId = jwtPMeta.tbUserId || jwtPMeta.tb_user_id || jwtPMeta.tb_id || jwtPubMeta.tbUserId || jwtUnsMeta.tbUserId || null;
+                    userTbUsername = jwtPMeta.tbUsername || jwtPMeta.tb_username || jwtPMeta.tbUser || jwtPubMeta.tbUsername || jwtUnsMeta.tbUsername || null;
+                    userTbPassword = jwtPMeta.tbPassword || jwtPMeta.tb_password || jwtPMeta.tbPass || jwtPubMeta.tbPassword || jwtUnsMeta.tbPassword || null;
+                    userStaticToken = jwtPMeta.tbToken || jwtPMeta.tb_token || jwtPubMeta.tbToken || jwtUnsMeta.tbToken || null;
+
+                    // 2. Si no se encontró en las claims del JWT, consultar la API REST de Clerk usando CLERK_SECRET_KEY
                     const clerkSecretKey = process.env.CLERK_SECRET_KEY;
-                    if (userId && clerkSecretKey) {
-                        const clerkRes = await fetch(`https://api.clerk.com/v1/users/${userId}`, {
+                    if (clerkUserId && clerkSecretKey && (!targetUserId || !userTbUsername)) {
+                        const clerkRes = await fetch(`https://api.clerk.com/v1/users/${clerkUserId}`, {
                             headers: {
                                 'Authorization': `Bearer ${clerkSecretKey}`,
                                 'Content-Type': 'application/json'
@@ -52,10 +65,11 @@ export default async function handler(req, res) {
                             const pubMeta = clerkUser.public_metadata || {};
                             const unsMeta = clerkUser.unsafe_metadata || {};
 
-                            targetUserId = pMeta.tbUserId || pMeta.tb_user_id || pubMeta.tbUserId || unsMeta.tbUserId || null;
-                            userTbUsername = pMeta.tbUsername || pMeta.tbUser || pubMeta.tbUsername || unsMeta.tbUsername || null;
-                            userTbPassword = pMeta.tbPassword || pMeta.tbPass || pubMeta.tbPassword || unsMeta.tbPassword || null;
-                            
+                            targetUserId = targetUserId || pMeta.tbUserId || pMeta.tb_user_id || pMeta.tb_id || pubMeta.tbUserId || unsMeta.tbUserId || null;
+                            userTbUsername = userTbUsername || pMeta.tbUsername || pMeta.tb_username || pMeta.tbUser || pubMeta.tbUsername || unsMeta.tbUsername || null;
+                            userTbPassword = userTbPassword || pMeta.tbPassword || pMeta.tb_password || pMeta.tbPass || pubMeta.tbPassword || unsMeta.tbPassword || null;
+                            userStaticToken = userStaticToken || pMeta.tbToken || pMeta.tb_token || pubMeta.tbToken || unsMeta.tbToken || null;
+
                             if (!userEmail && clerkUser.email_addresses && clerkUser.email_addresses.length > 0) {
                                 userEmail = clerkUser.email_addresses[0].email_address;
                             }
@@ -67,7 +81,12 @@ export default async function handler(req, res) {
             }
         }
 
-        // Si el usuario en Clerk tiene su propio usuario/contraseña de TB en metadata, hacer login directo
+        // SI EL USUARIO TIENE UN TOKEN ESTÁTICO EN SU METADATA DE CLERK:
+        if (userStaticToken) {
+            return res.status(200).json({ token: userStaticToken });
+        }
+
+        // SI EL USUARIO TIENE USUARIO Y CONTRASEÑA ESPECÍFICOS EN SU METADATA DE CLERK:
         if (userTbUsername && userTbPassword) {
             const directLoginRes = await fetch(`${baseUrl}/api/auth/login`, {
                 method: 'POST',
@@ -86,14 +105,14 @@ export default async function handler(req, res) {
             }
         }
 
-        // De lo contrario, usar las credenciales del Administrador de entorno para autenticarse e impersonar al usuario (Customer)
+        // AUTENTICACIÓN CON ADMIN PARA IMPERSONAR AL USUARIO ESPECÍFICO DE CLERK
         if (!envUser || !envPass) {
             return res.status(500).json({ 
-                error: 'Falta configurar TB_USERNAME y TB_PASSWORD en el panel de Vercel (o en los metadatos del usuario de Clerk).' 
+                error: 'Falta configurar TB_USERNAME y TB_PASSWORD de administrador en Vercel.' 
             });
         }
 
-        // 1. Login del Administrador
+        // 1. Autenticar el Administrador
         const adminLoginRes = await fetch(`${baseUrl}/api/auth/login`, {
             method: 'POST',
             headers: { 
@@ -106,19 +125,20 @@ export default async function handler(req, res) {
         if (!adminLoginRes.ok) {
             const errData = await adminLoginRes.text().catch(() => '');
             return res.status(401).json({ 
-                error: `Error al autenticar admin con ThingsBoard (/api/auth/login para '${envUser}')`, 
+                error: `Error al autenticar administrador con ThingsBoard`, 
                 details: errData 
             });
         }
 
         const adminData = await adminLoginRes.json();
-
         if (!adminData || !adminData.token) {
             return res.status(500).json({ error: 'ThingsBoard no devolvió un token de administrador válido.' });
         }
 
-        // 2. Buscar dinámicamente el User ID del usuario por su email si no se proveyó targetUserId específico
+        // 2. Determinar el User ID específico del usuario en ThingsBoard
         let resolvedUserId = targetUserId;
+
+        // Si no está en metadata pero se tiene el email del usuario de Clerk, buscarlo en ThingsBoard
         if (!resolvedUserId && userEmail) {
             try {
                 const userSearchRes = await fetch(`${baseUrl}/api/user?email=${encodeURIComponent(userEmail)}`, {
@@ -139,31 +159,36 @@ export default async function handler(req, res) {
             }
         }
 
-        const finalTargetUserId = resolvedUserId || envTargetUserId;
+        // Si no se encontró un ID específico para este usuario de Clerk:
+        const finalTargetUserId = resolvedUserId || envDefaultUserId;
 
-        // 3. Obtener el Token JWT del Cliente (Customer) mediante Impersonation (/api/user/{finalTargetUserId}/token)
-        if (finalTargetUserId) {
-            const impersonateRes = await fetch(`${baseUrl}/api/user/${finalTargetUserId}/token`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Authorization': `Bearer ${adminData.token}`,
-                    'ngrok-skip-browser-warning': 'true'
-                }
+        if (!finalTargetUserId) {
+            return res.status(403).json({
+                error: `El usuario de Clerk (${userEmail || clerkUserId || 'autenticado'}) no tiene un ID de ThingsBoard (tbUserId) asignado en sus metadatos de Clerk ni existe un usuario con ese email en ThingsBoard.`
             });
+        }
 
-            if (impersonateRes.ok) {
-                const impData = await impersonateRes.json();
-                if (impData && impData.token) {
-                    return res.status(200).json({ token: impData.token });
-                }
-            } else {
-                const impErrText = await impersonateRes.text().catch(() => '');
-                console.warn(`No se pudo obtener token para User ID ${finalTargetUserId}:`, impErrText);
+        // 3. Impersonar ÚNICAMENTE al usuario especifico correspondiente
+        const impersonateRes = await fetch(`${baseUrl}/api/user/${finalTargetUserId}/token`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Authorization': `Bearer ${adminData.token}`,
+                'ngrok-skip-browser-warning': 'true'
+            }
+        });
+
+        if (impersonateRes.ok) {
+            const impData = await impersonateRes.json();
+            if (impData && impData.token) {
+                return res.status(200).json({ token: impData.token });
             }
         }
 
-        // Fallback: retornar token de admin si no se pudo impersonar
-        return res.status(200).json({ token: adminData.token });
+        const impErrText = await impersonateRes.text().catch(() => '');
+        return res.status(403).json({
+            error: `No se pudo obtener el token para el usuario de ThingsBoard (User ID: ${finalTargetUserId}).`,
+            details: impErrText
+        });
 
     } catch (error) {
         return res.status(500).json({ error: 'Error del servidor backend', message: error.message });
