@@ -13,10 +13,16 @@ export default async function handler(req, res) {
     }
 
     try {
-        const baseUrl = process.env.TB_BASE_URL || 'https://thingsboard.cloud';
+        const baseUrl = (process.env.TB_BASE_URL || 'https://thingsboard.cloud').replace(/\/+$/, '');
+        
+        // Credenciales de entorno
+        const envUser = process.env.TB_USERNAME || process.env.TB_ADMIN_USER || process.env.TB_USER;
+        const envPass = process.env.TB_PASSWORD || process.env.TB_ADMIN_PASS || process.env.TB_ADMIN_PASSWORD;
         const adminApiKey = process.env.TB_ADMIN_API_KEY || process.env.TB_API_KEY;
         
-        let targetUserId = 'f48c29f0-8a96-11f1-a40e-2ba7ae4918b3'; // ID por defecto de Ricardo Magallanes
+        let targetUserId = 'f48c29f0-8a96-11f1-a40e-2ba7ae4918b3'; // ID por defecto
+        let userTbUsername = null;
+        let userTbPassword = null;
         let userApiKey = null;
 
         // Extraer token de sesión de Clerk si viene en la cabecera Authorization
@@ -49,6 +55,8 @@ export default async function handler(req, res) {
                             if (foundUserId) {
                                 targetUserId = foundUserId;
                             }
+                            userTbUsername = pMeta.tbUsername || pMeta.tbUser || pubMeta.tbUsername || unsMeta.tbUsername;
+                            userTbPassword = pMeta.tbPassword || pMeta.tbPass || pubMeta.tbPassword || unsMeta.tbPassword;
                             userApiKey = pMeta.tbApiKey || pMeta.apiKey || pubMeta.tbApiKey || unsMeta.tbApiKey;
                         }
                     }
@@ -58,38 +66,72 @@ export default async function handler(req, res) {
             }
         }
 
-        // Clave de API a utilizar para la solicitud de Impersonation (Admin o del propio usuario)
-        const apiKeyToUse = adminApiKey || userApiKey;
+        // MÉTODO 1: Autenticación por Usuario y Contraseña (/api/auth/login)
+        const usernameToUse = userTbUsername || envUser;
+        const passwordToUse = userTbPassword || envPass;
 
-        if (!apiKeyToUse) {
-            return res.status(500).json({ 
-                error: 'Falta configurar TB_ADMIN_API_KEY en el panel de Vercel.' 
+        if (usernameToUse && passwordToUse) {
+            const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: usernameToUse, password: passwordToUse })
             });
-        }
 
-        // Solicitar el Token JWT del usuario mediante Impersonation (/api/user/{userId}/token)
-        const impersonateRes = await fetch(`${baseUrl}/api/user/${targetUserId}/token`, {
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Authorization': `ApiKey ${apiKeyToUse}`
+            if (loginRes.ok) {
+                const loginData = await loginRes.json();
+                if (loginData && loginData.token) {
+                    // Si este usuario es un Admin y se busca impersonar a otro targetUserId distinto
+                    if (targetUserId && targetUserId !== 'f48c29f0-8a96-11f1-a40e-2ba7ae4918b3') {
+                        const impersonateRes = await fetch(`${baseUrl}/api/user/${targetUserId}/token`, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Authorization': `Bearer ${loginData.token}`
+                            }
+                        });
+
+                        if (impersonateRes.ok) {
+                            const impData = await impersonateRes.json();
+                            if (impData && impData.token) {
+                                return res.status(200).json({ token: impData.token });
+                            }
+                        }
+                    }
+                    // Si el login fue directo para el usuario
+                    return res.status(200).json({ token: loginData.token });
+                }
+            } else {
+                const errText = await loginRes.text().catch(() => '');
+                console.warn('Fallo login /api/auth/login:', errText);
             }
-        });
+        }
 
-        if (!impersonateRes.ok) {
-            const errData = await impersonateRes.text().catch(() => '');
-            return res.status(401).json({ 
-                error: `Error al obtener el token del cliente (User ID: ${targetUserId})`, 
-                details: errData 
+        // MÉTODO 2: Impersonación mediante API Key (ThingsBoard Cloud PE)
+        const apiKeyToUse = adminApiKey || userApiKey;
+        if (apiKeyToUse) {
+            const impersonateRes = await fetch(`${baseUrl}/api/user/${targetUserId}/token`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Authorization': `ApiKey ${apiKeyToUse}`
+                }
             });
+
+            if (impersonateRes.ok) {
+                const tokenData = await impersonateRes.json();
+                if (tokenData && tokenData.token) {
+                    return res.status(200).json({ token: tokenData.token });
+                }
+            } else {
+                const errData = await impersonateRes.text().catch(() => '');
+                return res.status(401).json({ 
+                    error: `Error al obtener el token mediante ApiKey (User ID: ${targetUserId})`, 
+                    details: errData 
+                });
+            }
         }
 
-        const tokenData = await impersonateRes.json();
-        
-        if (tokenData && tokenData.token) {
-            return res.status(200).json({ token: tokenData.token });
-        } else {
-            return res.status(500).json({ error: 'ThingsBoard no devolvió un token JWT válido.' });
-        }
+        return res.status(500).json({ 
+            error: 'Falta configurar credenciales (TB_USERNAME y TB_PASSWORD o TB_ADMIN_API_KEY) en el panel de Vercel.' 
+        });
 
     } catch (error) {
         return res.status(500).json({ error: 'Error del servidor backend', message: error.message });
