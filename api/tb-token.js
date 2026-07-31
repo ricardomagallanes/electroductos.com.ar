@@ -26,6 +26,7 @@ export default async function handler(req, res) {
 
         const sessionToken = authHeader.substring(7);
         let clerkUserId = null;
+        let userEmail = null;
         let targetUserId = null;
 
         try {
@@ -33,16 +34,22 @@ export default async function handler(req, res) {
             if (parts.length === 3) {
                 const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
                 clerkUserId = payload.sub;
+                userEmail = payload.email || payload.primary_email || (payload.email_addresses && payload.email_addresses[0]) || null;
 
-                // Intentar leer private_metadata directamente de las claims del JWT
+                // Intentar leer metadata directamente del payload del JWT de Clerk
                 const jwtPMeta = payload.private_metadata || payload.privateMetadata || {};
-                targetUserId = jwtPMeta.tbUserId || jwtPMeta.tb_user_id || jwtPMeta.tb_id || jwtPMeta.tbId || jwtPMeta.tokenId || jwtPMeta.userId || jwtPMeta.id || null;
+                const jwtPubMeta = payload.public_metadata || payload.publicMetadata || {};
+                const jwtUnsMeta = payload.unsafe_metadata || payload.unsafeMetadata || payload.user_metadata || {};
+
+                targetUserId = jwtPMeta.tbUserId || jwtPMeta.tb_user_id || jwtPMeta.tb_id || jwtPMeta.tbId || jwtPMeta.tokenId || jwtPMeta.userId || jwtPMeta.id ||
+                               jwtPubMeta.tbUserId || jwtPubMeta.tb_user_id || jwtPubMeta.tb_id || jwtPubMeta.tbId || jwtPubMeta.tokenId || jwtPubMeta.userId || jwtPubMeta.id ||
+                               jwtUnsMeta.tbUserId || jwtUnsMeta.tb_user_id || jwtUnsMeta.tb_id || jwtUnsMeta.tbId || jwtUnsMeta.tokenId || jwtUnsMeta.userId || jwtUnsMeta.id || null;
             }
         } catch (e) {
             console.warn('Error decodificando token de Clerk:', e);
         }
 
-        // 2. Si no estaba en la claim del JWT, consultar la API REST de Clerk usando CLERK_SECRET_KEY
+        // 2. Consultar la API REST de Clerk con CLERK_SECRET_KEY si no estuvo en el JWT
         const clerkSecretKey = process.env.CLERK_SECRET_KEY;
         if (clerkUserId && clerkSecretKey && !targetUserId) {
             const clerkRes = await fetch(`https://api.clerk.com/v1/users/${clerkUserId}`, {
@@ -55,36 +62,21 @@ export default async function handler(req, res) {
             if (clerkRes.ok) {
                 const clerkUser = await clerkRes.json();
                 const pMeta = clerkUser.private_metadata || {};
-                targetUserId = pMeta.tbUserId || pMeta.tb_user_id || pMeta.tb_id || pMeta.tbId || pMeta.tokenId || pMeta.userId || pMeta.id || null;
-            }
-        }
+                const pubMeta = clerkUser.public_metadata || {};
+                const unsMeta = clerkUser.unsafe_metadata || {};
 
-        if (!targetUserId) {
-            return res.status(400).json({ 
-                error: 'No se encontró un ID de ThingsBoard (tbUserId) en los metadatos privados (private_metadata) del usuario en Clerk.' 
-            });
-        }
+                targetUserId = pMeta.tbUserId || pMeta.tb_user_id || pMeta.tb_id || pMeta.tbId || pMeta.tokenId || pMeta.userId || pMeta.id ||
+                               pubMeta.tbUserId || pubMeta.tb_user_id || pubMeta.tb_id || pubMeta.tbId || pubMeta.tokenId || pubMeta.userId || pubMeta.id ||
+                               unsMeta.tbUserId || unsMeta.tb_user_id || unsMeta.tb_id || unsMeta.tbId || unsMeta.tokenId || unsMeta.userId || unsMeta.id || null;
 
-        // 3. Obtener el token JWT del usuario desde ThingsBoard usando Impersonation
-        // Si hay una API Key de Admin configurada:
-        if (adminApiKey) {
-            const impersonateRes = await fetch(`${baseUrl}/api/user/${targetUserId}/token`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Authorization': `ApiKey ${adminApiKey}`,
-                    'ngrok-skip-browser-warning': 'true'
-                }
-            });
-
-            if (impersonateRes.ok) {
-                const tokenData = await impersonateRes.json();
-                if (tokenData && tokenData.token) {
-                    return res.status(200).json({ token: tokenData.token });
+                if (!userEmail && clerkUser.email_addresses && clerkUser.email_addresses.length > 0) {
+                    userEmail = clerkUser.email_addresses[0].email_address;
                 }
             }
         }
 
-        // Si hay usuario y contraseña de Admin configurados en Vercel:
+        // 3. Autenticación con Admin en ThingsBoard
+        let adminToken = null;
         if (adminUser && adminPass) {
             const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
                 method: 'POST',
@@ -97,27 +89,59 @@ export default async function handler(req, res) {
 
             if (loginRes.ok) {
                 const adminData = await loginRes.json();
-                if (adminData && adminData.token) {
-                    const impersonateRes = await fetch(`${baseUrl}/api/user/${targetUserId}/token`, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Authorization': `Bearer ${adminData.token}`,
-                            'ngrok-skip-browser-warning': 'true'
-                        }
-                    });
-
-                    if (impersonateRes.ok) {
-                        const impData = await impersonateRes.json();
-                        if (impData && impData.token) {
-                            return res.status(200).json({ token: impData.token });
-                        }
-                    }
-                }
+                adminToken = adminData.token;
             }
         }
 
-        return res.status(500).json({ 
-            error: `No se pudo obtener el token JWT de ThingsBoard para el User ID '${targetUserId}' obtenido de Clerk.` 
+        // 4. Si targetUserId aún no está definido, buscar al usuario en ThingsBoard por su dirección de email
+        if (!targetUserId && userEmail && (adminToken || adminApiKey)) {
+            try {
+                const authHeaderVal = adminApiKey ? `ApiKey ${adminApiKey}` : `Bearer ${adminToken}`;
+                const searchRes = await fetch(`${baseUrl}/api/user?email=${encodeURIComponent(userEmail)}`, {
+                    headers: {
+                        'X-Authorization': authHeaderVal,
+                        'ngrok-skip-browser-warning': 'true'
+                    }
+                });
+
+                if (searchRes.ok) {
+                    const foundUser = await searchRes.json();
+                    if (foundUser && foundUser.id && foundUser.id.id) {
+                        targetUserId = foundUser.id.id;
+                    }
+                }
+            } catch (searchErr) {
+                console.warn('Error al buscar usuario por email en TB:', searchErr);
+            }
+        }
+
+        if (!targetUserId) {
+            return res.status(400).json({ 
+                error: `No se encontró el ID de ThingsBoard (tbUserId) para el usuario de Clerk (${userEmail || clerkUserId || 'autenticado'}). Asegúrate de configurar tbUserId en private_metadata o crear el usuario en ThingsBoard con el mismo email.` 
+            });
+        }
+
+        // 5. Impersonar ÚNICAMENTE al usuario cliente específico
+        const authHeaderVal = adminApiKey ? `ApiKey ${adminApiKey}` : `Bearer ${adminToken}`;
+        const impersonateRes = await fetch(`${baseUrl}/api/user/${targetUserId}/token`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Authorization': authHeaderVal,
+                'ngrok-skip-browser-warning': 'true'
+            }
+        });
+
+        if (impersonateRes.ok) {
+            const impData = await impersonateRes.json();
+            if (impData && impData.token) {
+                return res.status(200).json({ token: impData.token });
+            }
+        }
+
+        const impErrText = await impersonateRes.text().catch(() => '');
+        return res.status(403).json({ 
+            error: `No se pudo obtener el token JWT de ThingsBoard para el User ID '${targetUserId}' obtenido de Clerk.`,
+            details: impErrText 
         });
 
     } catch (error) {
