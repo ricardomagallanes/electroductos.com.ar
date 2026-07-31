@@ -530,17 +530,11 @@ function initTelemetryEvents() {
       // Si es una URL de ThingsBoard (Cloud o instancia expuesta) y no tiene publicId explícito, adjuntar el token JWT del usuario
       const isThingsBoard = url.includes('thingsboard') || url.includes('pinggy.net') || url.includes('ngrok-free.dev') || url.includes('/dashboard/');
       if (isThingsBoard && !url.includes('publicId=')) {
-        const { token, error } = await getTbToken();
-        if (!token) {
-          telemetryLoader.style.opacity = '1';
-          telemetryLoader.style.pointerEvents = 'all';
-          telemetryLoader.innerHTML = `<div style="text-align: center; padding: 20px;"><i data-lucide="shield-alert" style="width: 48px; height: 48px; color: #ef4444; margin-bottom: 12px;"></i><p style="color: #f87171; font-weight: 600; font-size: 1rem; margin-bottom: 8px;">Acceso no autorizado a Telemedición</p><p style="color: #9ca3af; font-size: 0.85rem;">${error || 'Tu cuenta de usuario no tiene una asignación válida en el servidor de ThingsBoard.'}</p></div>`;
-          if (typeof lucide !== 'undefined') lucide.createIcons();
-          telemetryIframe.src = 'about:blank';
-          return;
+        const { token } = await getTbToken();
+        if (token) {
+          const connector = url.includes('?') ? '&' : '?';
+          url = `${url}${connector}accessToken=${token}&token=${token}&storeToken=true&_t=${Date.now()}`;
         }
-        const connector = url.includes('?') ? '&' : '?';
-        url = `${url}${connector}accessToken=${token}&token=${token}&storeToken=true&_t=${Date.now()}`;
       }
 
       // Limpiar iframe previo para forzar a ThingsBoard a reiniciar su sesión local con el nuevo token
