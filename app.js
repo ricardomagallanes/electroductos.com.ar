@@ -80,7 +80,7 @@ const thingsboardDashboardId = 'f7e91ec0-8a21-11f1-8b3b-037118875eb0';
 // URLs for Telemetry dashboards
 const telemetryUrls = {
   'coop-a': 'https://shenmu.usriot.com/share?s=fcc9ub9b1z&a=aHR0cHM6Ly9zaGVubXUudXNyaW90LmNvbS9zaGFyZQ==&l=en',
-  'coop-b': 'https://thingsboard.cloud/dashboard/f7e91ec0-8a21-11f1-8b3b-037118875eb0?publicId=cc816e10-8ac9-11f1-8b3b-037118875eb0',
+  'coop-b': 'https://ifczh-186-122-131-134.free.pinggy.net/dashboard/f7e91ec0-8a21-11f1-8b3b-037118875eb0',
   'coop-c': 'https://liberalistic-grinningly-caylee.ngrok-free.dev/nodered/ui/#!/0?socketid=XYKQyYr-wwbjIbqvAAAJ',
   'coop-d': 'https://f0a509af.us2a.app.preset.io/superset/embedded/0104b04a-5f7d-4f0c-b533-8df57fea43ee?standalone=true'
 };
@@ -527,8 +527,9 @@ function initTelemetryEvents() {
         telemetryPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 100);
 
-      // Si es la vista de ThingsBoard Cloud y no tiene publicId explícito, adjuntar el token JWT del usuario
-      if (url.includes('thingsboard.cloud') && !url.includes('publicId=')) {
+      // Si es una URL de ThingsBoard (Cloud o instancia expuesta) y no tiene publicId explícito, adjuntar el token JWT del usuario
+      const isThingsBoard = url.includes('thingsboard') || url.includes('pinggy.net') || url.includes('/dashboard/');
+      if (isThingsBoard && !url.includes('publicId=')) {
         const { token } = await getTbToken();
         if (token) {
           const connector = url.includes('?') ? '&' : '?';
