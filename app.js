@@ -533,12 +533,15 @@ function initTelemetryEvents() {
         const { token } = await getTbToken();
         if (token) {
           const connector = url.includes('?') ? '&' : '?';
-          url = `${url}${connector}accessToken=${token}&token=${token}`;
+          url = `${url}${connector}accessToken=${token}&token=${token}&storeToken=true&_t=${Date.now()}`;
         }
       }
 
-      // Update iframe source
-      telemetryIframe.src = url;
+      // Limpiar iframe previo para forzar a ThingsBoard a reiniciar su sesión local con el nuevo token
+      telemetryIframe.src = 'about:blank';
+      setTimeout(() => {
+        telemetryIframe.src = url;
+      }, 100);
     });
   });
 
