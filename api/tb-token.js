@@ -13,12 +13,12 @@ export default async function handler(req, res) {
     }
 
     try {
-        const baseUrl = (process.env.TB_BASE_URL || 'https://chastity-video-proactive.ngrok-free.dev').replace(/\/+$/, '');
+        const baseUrl = (process.env.TB_BASE_URL || '').replace(/\/+$/, '');
         
         // Credenciales predeterminadas de administrador en entorno Vercel
         const envUser = process.env.TB_USERNAME || process.env.TB_ADMIN_USER || process.env.TB_USER;
         const envPass = process.env.TB_PASSWORD || process.env.TB_ADMIN_PASS || process.env.TB_ADMIN_PASSWORD;
-        const envDefaultUserId = process.env.TB_USER_ID || process.env.TB_TARGET_USER_ID || '99644860-8ced-11f1-8d8a-a962a2e26a4f';
+        const envDefaultUserId = process.env.TB_USER_ID || process.env.TB_TARGET_USER_ID || null;
         
         let clerkUserId = null;
         let userEmail = null;
