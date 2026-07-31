@@ -73,7 +73,10 @@ export default async function handler(req, res) {
         // Realizar autenticación HTTP POST en /api/auth/login de ThingsBoard
         const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
             body: JSON.stringify({ username: usernameToUse, password: passwordToUse })
         });
 
@@ -93,7 +96,8 @@ export default async function handler(req, res) {
                 const impersonateRes = await fetch(`${baseUrl}/api/user/${targetUserId}/token`, {
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-Authorization': `Bearer ${loginData.token}`
+                        'X-Authorization': `Bearer ${loginData.token}`,
+                        'ngrok-skip-browser-warning': 'true'
                     }
                 });
 
