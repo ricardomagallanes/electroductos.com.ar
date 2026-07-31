@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const baseUrl = (process.env.TB_BASE_URL || 'https://thingsboard.cloud').replace(/\/+$/, '');
+        const baseUrl = (process.env.TB_BASE_URL || 'https://chastity-video-proactive.ngrok-free.dev').replace(/\/+$/, '');
         
         // Credenciales predeterminadas de administrador en entorno Vercel
         const envUser = process.env.TB_USERNAME || process.env.TB_ADMIN_USER || process.env.TB_USER;
