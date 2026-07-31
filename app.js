@@ -75,12 +75,12 @@ const products = [
 ];
 
 // ThingsBoard Dashboard ID
-const thingsboardDashboardId = 'f7e91ec0-8a21-11f1-8b3b-037118875eb0';
+const thingsboardDashboardId = 'a40156d0-8c8b-11f1-8d8a-a962a2e26a4f';
 
 // URLs for Telemetry dashboards
 const telemetryUrls = {
   'coop-a': 'https://shenmu.usriot.com/share?s=fcc9ub9b1z&a=aHR0cHM6Ly9zaGVubXUudXNyaW90LmNvbS9zaGFyZQ==&l=en',
-  'coop-b': 'https://ifczh-186-122-131-134.free.pinggy.net/dashboard/f7e91ec0-8a21-11f1-8b3b-037118875eb0',
+  'coop-b': 'http://ifczh-186-122-131-134.free.pinggy.net/dashboard/a40156d0-8c8b-11f1-8d8a-a962a2e26a4f',
   'coop-c': 'https://liberalistic-grinningly-caylee.ngrok-free.dev/nodered/ui/#!/0?socketid=XYKQyYr-wwbjIbqvAAAJ',
   'coop-d': 'https://f0a509af.us2a.app.preset.io/superset/embedded/0104b04a-5f7d-4f0c-b533-8df57fea43ee?standalone=true'
 };
