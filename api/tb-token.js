@@ -36,43 +36,53 @@ export default async function handler(req, res) {
                 clerkUserId = payload.sub;
                 userEmail = payload.email || payload.primary_email || (payload.email_addresses && payload.email_addresses[0]) || null;
 
-                // Intentar leer metadata directamente del payload del JWT de Clerk
+                // Extraer tb_user_id como clave prioritaria #1 de private_metadata
                 const jwtPMeta = payload.private_metadata || payload.privateMetadata || {};
                 const jwtPubMeta = payload.public_metadata || payload.publicMetadata || {};
                 const jwtUnsMeta = payload.unsafe_metadata || payload.unsafeMetadata || payload.user_metadata || {};
 
-                targetUserId = jwtPMeta.tbUserId || jwtPMeta.tb_user_id || jwtPMeta.tb_id || jwtPMeta.tbId || jwtPMeta.tokenId || jwtPMeta.userId || jwtPMeta.id ||
-                               jwtPubMeta.tbUserId || jwtPubMeta.tb_user_id || jwtPubMeta.tb_id || jwtPubMeta.tbId || jwtPubMeta.tokenId || jwtPubMeta.userId || jwtPubMeta.id ||
-                               jwtUnsMeta.tbUserId || jwtUnsMeta.tb_user_id || jwtUnsMeta.tb_id || jwtUnsMeta.tbId || jwtUnsMeta.tokenId || jwtUnsMeta.userId || jwtUnsMeta.id || null;
+                targetUserId = jwtPMeta.tb_user_id || jwtPMeta.tbUserId || jwtPMeta.tb_id || jwtPMeta.tbId || jwtPMeta.tokenId || jwtPMeta.userId || jwtPMeta.id ||
+                               jwtPubMeta.tb_user_id || jwtPubMeta.tbUserId || jwtPubMeta.tb_id || jwtPubMeta.tbId || jwtPubMeta.tokenId || jwtPubMeta.userId || jwtPubMeta.id ||
+                               jwtUnsMeta.tb_user_id || jwtUnsMeta.tbUserId || jwtUnsMeta.tb_id || jwtUnsMeta.tbId || jwtUnsMeta.tokenId || jwtUnsMeta.userId || jwtUnsMeta.id || null;
             }
         } catch (e) {
             console.warn('Error decodificando token de Clerk:', e);
         }
 
-        // 2. Consultar la API REST de Clerk con CLERK_SECRET_KEY si no estuvo en el JWT
+        // 2. Consultar la API REST de Clerk usando CLERK_SECRET_KEY para obtener la private_metadata guardada en Clerk
         const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+        let clerkFetchError = null;
+
         if (clerkUserId && clerkSecretKey && !targetUserId) {
-            const clerkRes = await fetch(`https://api.clerk.com/v1/users/${clerkUserId}`, {
-                headers: {
-                    'Authorization': `Bearer ${clerkSecretKey}`,
-                    'Content-Type': 'application/json'
+            try {
+                const clerkRes = await fetch(`https://api.clerk.com/v1/users/${clerkUserId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${clerkSecretKey}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (clerkRes.ok) {
+                    const clerkUser = await clerkRes.json();
+                    const pMeta = clerkUser.private_metadata || {};
+                    const pubMeta = clerkUser.public_metadata || {};
+                    const unsMeta = clerkUser.unsafe_metadata || {};
+
+                    targetUserId = pMeta.tb_user_id || pMeta.tbUserId || pMeta.tb_id || pMeta.tbId || pMeta.tokenId || pMeta.userId || pMeta.id ||
+                                   pubMeta.tb_user_id || pubMeta.tbUserId || pubMeta.tb_id || pubMeta.tbId || pubMeta.tokenId || pubMeta.userId || pubMeta.id ||
+                                   unsMeta.tb_user_id || unsMeta.tbUserId || unsMeta.tb_id || unsMeta.tbId || unsMeta.tokenId || unsMeta.userId || unsMeta.id || null;
+
+                    if (!userEmail && clerkUser.email_addresses && clerkUser.email_addresses.length > 0) {
+                        userEmail = clerkUser.email_addresses[0].email_address;
+                    }
+                } else {
+                    clerkFetchError = `Clerk API devolvió el estado HTTP ${clerkRes.status}`;
                 }
-            });
-
-            if (clerkRes.ok) {
-                const clerkUser = await clerkRes.json();
-                const pMeta = clerkUser.private_metadata || {};
-                const pubMeta = clerkUser.public_metadata || {};
-                const unsMeta = clerkUser.unsafe_metadata || {};
-
-                targetUserId = pMeta.tbUserId || pMeta.tb_user_id || pMeta.tb_id || pMeta.tbId || pMeta.tokenId || pMeta.userId || pMeta.id ||
-                               pubMeta.tbUserId || pubMeta.tb_user_id || pubMeta.tb_id || pubMeta.tbId || pubMeta.tokenId || pubMeta.userId || pubMeta.id ||
-                               unsMeta.tbUserId || unsMeta.tb_user_id || unsMeta.tb_id || unsMeta.tbId || unsMeta.tokenId || unsMeta.userId || unsMeta.id || null;
-
-                if (!userEmail && clerkUser.email_addresses && clerkUser.email_addresses.length > 0) {
-                    userEmail = clerkUser.email_addresses[0].email_address;
-                }
+            } catch (cErr) {
+                clerkFetchError = cErr.message;
             }
+        } else if (!clerkSecretKey && !targetUserId) {
+            clerkFetchError = 'Falta la variable de entorno CLERK_SECRET_KEY en Vercel para consultar la private_metadata desde la API de Clerk.';
         }
 
         // 3. Autenticación con Admin en ThingsBoard
@@ -93,7 +103,7 @@ export default async function handler(req, res) {
             }
         }
 
-        // 4. Si targetUserId aún no está definido, buscar al usuario en ThingsBoard por su dirección de email
+        // 4. Si targetUserId no estuvo en private_metadata, buscar por email en ThingsBoard
         if (!targetUserId && userEmail && (adminToken || adminApiKey)) {
             try {
                 const authHeaderVal = adminApiKey ? `ApiKey ${adminApiKey}` : `Bearer ${adminToken}`;
@@ -117,11 +127,12 @@ export default async function handler(req, res) {
 
         if (!targetUserId) {
             return res.status(400).json({ 
-                error: `No se encontró el ID de ThingsBoard (tbUserId) para el usuario de Clerk (${userEmail || clerkUserId || 'autenticado'}). Asegúrate de configurar tbUserId en private_metadata o crear el usuario en ThingsBoard con el mismo email.` 
+                error: `No se pudo obtener el tb_user_id de la private_metadata de Clerk para el usuario (${userEmail || clerkUserId || 'autenticado'}).`,
+                details: clerkFetchError || 'Asegúrate de que la variable CLERK_SECRET_KEY esté configurada en Vercel y que la clave en private_metadata sea "tb_user_id".'
             });
         }
 
-        // 5. Impersonar ÚNICAMENTE al usuario cliente específico
+        // 5. Impersonar al usuario cliente en ThingsBoard usando el tb_user_id extraído
         const authHeaderVal = adminApiKey ? `ApiKey ${adminApiKey}` : `Bearer ${adminToken}`;
         const impersonateRes = await fetch(`${baseUrl}/api/user/${targetUserId}/token`, {
             headers: {
@@ -140,7 +151,7 @@ export default async function handler(req, res) {
 
         const impErrText = await impersonateRes.text().catch(() => '');
         return res.status(403).json({ 
-            error: `No se pudo obtener el token JWT de ThingsBoard para el User ID '${targetUserId}' obtenido de Clerk.`,
+            error: `No se pudo obtener el token JWT de ThingsBoard para el tb_user_id '${targetUserId}' extraído de Clerk.`,
             details: impErrText 
         });
 
