@@ -80,7 +80,7 @@ const thingsboardDashboardId = 'a40156d0-8c8b-11f1-8d8a-a962a2e26a4f';
 // URLs for Telemetry dashboards
 const telemetryUrls = {
   'coop-a': 'https://shenmu.usriot.com/share?s=fcc9ub9b1z&a=aHR0cHM6Ly9zaGVubXUudXNyaW90LmNvbS9zaGFyZQ==&l=en',
-  'coop-b': 'http://www.tecnomag.com.ar:8081/dashboard/a40156d0-8c8b-11f1-8d8a-a962a2e26a4f',
+  'coop-b': 'http://www.tecnomag.com.ar:8081/dashboards/a40156d0-8c8b-11f1-8d8a-a962a2e26a4f',
   'coop-c': 'https://liberalistic-grinningly-caylee.ngrok-free.dev/nodered/ui/#!/0?socketid=XYKQyYr-wwbjIbqvAAAJ',
   'coop-d': 'https://f0a509af.us2a.app.preset.io/superset/embedded/0104b04a-5f7d-4f0c-b533-8df57fea43ee?standalone=true'
 };
@@ -528,7 +528,7 @@ function initTelemetryEvents() {
       }, 100);
 
       // Si es una URL de ThingsBoard (Cloud o instancia expuesta) y no tiene publicId explícito, adjuntar el token JWT del usuario
-      const isThingsBoard = url.includes('thingsboard') || url.includes('pinggy.net') || url.includes('ngrok-free.dev') || url.includes('tecnomag') || url.includes('/dashboard/');
+      const isThingsBoard = url.includes('thingsboard') || url.includes('pinggy.net') || url.includes('ngrok-free.dev') || url.includes('tecnomag') || url.includes('/dashboard/') || url.includes('/dashboards');
       if (isThingsBoard && !url.includes('publicId=')) {
         const { token, error } = await getTbToken();
         if (token) {
