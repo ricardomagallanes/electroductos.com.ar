@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const baseUrl = (process.env.TB_BASE_URL || 'https://chastity-video-proactive.ngrok-free.dev').replace(/\/+$/, '');
+        const baseUrl = (process.env.TB_BASE_URL || 'http://www.tecnomag.com.ar:8081').replace(/\/+$/, '');
         const adminUser = process.env.TB_USERNAME || process.env.TB_ADMIN_USER;
         const adminPass = process.env.TB_PASSWORD || process.env.TB_ADMIN_PASS;
         const adminApiKey = process.env.TB_ADMIN_API_KEY || process.env.TB_API_KEY;
