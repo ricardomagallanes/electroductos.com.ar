@@ -1002,3 +1002,65 @@ footer {
   border-color: var(--color-primary) !important;
   box-shadow: 0 0 10px rgba(0, 242, 254, 0.25);
 }
+
+/* Custom UI for Clerk User Button Popover Modal */
+.cl-userButtonPopoverCard {
+  background-color: #0D152D !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 242, 254, 0.1) !important;
+  border-radius: 16px !important;
+}
+
+.cl-userButtonPopoverMain {
+  background-color: #0D152D !important;
+}
+
+.cl-userButtonPopoverIdentifier {
+  color: #FFFFFF !important;
+  font-weight: 600 !important;
+}
+
+.cl-userButtonPopoverSubIdentifier {
+  color: #9CA3AF !important;
+}
+
+.cl-userButtonPopoverActionButton {
+  color: #F3F4F6 !important;
+  border-radius: 8px !important;
+  transition: background-color 0.2s ease;
+}
+
+.cl-userButtonPopoverActionButton:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.cl-userButtonPopoverActionButtonText {
+  color: #F3F4F6 !important;
+  font-weight: 500 !important;
+}
+
+.cl-userButtonPopoverActionButtonIcon,
+.cl-userButtonPopoverActionButtonIcon svg {
+  color: #00F2FE !important;
+  opacity: 1 !important;
+}
+
+.cl-userButtonPopoverFooter,
+.cl-userButtonPopoverFooter p,
+.cl-userButtonPopoverFooter a,
+.cl-userButtonPopoverFooter span {
+  color: #9CA3AF !important;
+}
+
+.cl-userButtonPopoverFooter a:hover {
+  color: #00F2FE !important;
+}
+
+.cl-userButtonPopoverCard * {
+  color: #F3F4F6;
+}
+
+.cl-userButtonPopoverCard .cl-userButtonPopoverSubIdentifier,
+.cl-userButtonPopoverCard .cl-userButtonPopoverFooterText {
+  color: #9CA3AF !important;
+}

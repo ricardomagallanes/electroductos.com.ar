@@ -239,7 +239,27 @@ function updateAuthState() {
         appearance: {
           variables: {
             colorBackground: '#0D152D',
-            colorText: '#F3F4F6'
+            colorText: '#F3F4F6',
+            colorTextSecondary: '#9CA3AF',
+            colorPrimary: '#00F2FE'
+          },
+          elements: {
+            userButtonPopoverCard: {
+              backgroundColor: '#0D152D',
+              border: '1px solid rgba(255, 255, 255, 0.12)'
+            },
+            userButtonPopoverActionButton: {
+              color: '#F3F4F6'
+            },
+            userButtonPopoverActionButtonText: {
+              color: '#F3F4F6'
+            },
+            userButtonPopoverActionButtonIcon: {
+              color: '#00F2FE'
+            },
+            userButtonPopoverFooter: {
+              color: '#9CA3AF'
+            }
           }
         }
       });
