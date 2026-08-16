@@ -323,6 +323,8 @@ function updateAuthState() {
     // Make sure panels/modals are closed
     telemetryPanel.classList.remove('active');
     telemetryIframe.src = '';
+    document.body.classList.remove('no-scroll');
+    document.documentElement.classList.remove('no-scroll');
     orgProfileModal.style.display = 'none';
   }
 }
@@ -533,19 +535,16 @@ function initTelemetryEvents() {
 
       if (!url) return;
 
-      // Desplegar el panel INMEDIATAMENTE al hacer clic
+      // Desplegar el panel a pantalla completa e inhabilitar scroll de la página
       telemetryPanel.classList.add('active');
+      document.body.classList.add('no-scroll');
+      document.documentElement.classList.add('no-scroll');
 
       // Show loader and update title
       telemetryLoader.style.opacity = '1';
       telemetryLoader.style.pointerEvents = 'all';
       telemetryLoader.innerHTML = '<div class="spinner"></div><p>Cargando panel de telemedición...</p>';
       activeCoopTitle.innerText = `Panel de Control - ${coopName}`;
-
-      // Smooth scroll al panel desplegado
-      setTimeout(() => {
-        telemetryPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
 
       // Si es una URL de ThingsBoard (Cloud o instancia expuesta) y no tiene publicId explícito, adjuntar el token JWT del usuario
       const isThingsBoard = url.includes('thingsboard') || url.includes('pinggy.net') || url.includes('ngrok-free.dev') || url.includes('tecnomag') || url.includes('/dashboard/') || url.includes('/dashboards');
@@ -583,6 +582,8 @@ function initTelemetryEvents() {
   closeIframeBtn.addEventListener('click', () => {
     telemetryPanel.classList.remove('active');
     telemetryIframe.src = '';
+    document.body.classList.remove('no-scroll');
+    document.documentElement.classList.remove('no-scroll');
   });
 
   // Bloquear zoom con Ctrl+scroll (rueda del mouse) sobre el iframe
