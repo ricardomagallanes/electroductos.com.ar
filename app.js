@@ -574,7 +574,7 @@ async function openTelemetryPanel(coopName, targetUrl) {
   telemetryLoader.style.opacity = '1';
   telemetryLoader.style.pointerEvents = 'all';
   telemetryLoader.innerHTML = '<div class="spinner"></div><p>Cargando panel de telemedición...</p>';
-  activeCoopTitle.innerText = `Panel de Control - ${coopName}`;
+  activeCoopTitle.innerText = coopName;
 
   // Si es una URL de ThingsBoard (Cloud o instancia expuesta) y no tiene publicId explícito, adjuntar el token JWT del usuario
   const isThingsBoard = url.includes('thingsboard') || url.includes('pinggy.net') || url.includes('ngrok-free.dev') || url.includes('tecnomag') || url.includes('/dashboard/') || url.includes('/dashboards');
