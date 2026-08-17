@@ -256,7 +256,7 @@ function updateAuthState() {
 
     // Ocultar panel de login e inicializar datos de telemetría
     authPanel.style.display = 'none';
-    coopGrid.style.display = 'grid';
+    coopGrid.style.display = 'flex';
     telemetrySubtitle.style.display = 'block';
 
     // OBTENER MEMBRESÍAS DE ORGANIZACIÓN DEL USUARIO DESDE CLERK
