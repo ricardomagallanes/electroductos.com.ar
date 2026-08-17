@@ -74,18 +74,6 @@ const products = [
   }
 ];
 
-// ThingsBoard Dashboard ID
-const thingsboardDashboardId = 'a40156d0-8c8b-11f1-8d8a-a962a2e26a4f';
-
-// URLs for Telemetry dashboards
-const telemetryUrls = {
-  'coop-a': 'https://shenmu.usriot.com/share?s=fcc9ub9b1z&a=aHR0cHM6Ly9zaGVubXUudXNyaW90LmNvbS9zaGFyZQ==&l=en',
-  'coop-b': 'https://www.tecnomag.com.ar/dashboard/a40156d0-8c8b-11f1-8d8a-a962a2e26a4f',
-  'org_3GgM8vfNww8ljw4rZwclmr7vIfd': 'https://www.tecnomag.com.ar/dashboard/a40156d0-8c8b-11f1-8d8a-a962a2e26a4f',
-  'coop-c': 'https://liberalistic-grinningly-caylee.ngrok-free.dev/nodered/ui/#!/0?socketid=XYKQyYr-wwbjIbqvAAAJ',
-  'coop-d': 'https://f0a509af.us2a.app.preset.io/superset/embedded/0104b04a-5f7d-4f0c-b533-8df57fea43ee?standalone=true'
-};
-
 // DOM Elements
 const grid = document.getElementById('products-display-grid');
 const tabs = document.querySelectorAll('.tab-btn');
@@ -98,7 +86,6 @@ const telemetrySection = document.getElementById('telemedicion');
 const catalogSection = document.getElementById('catalogo');
 const heroSection = document.getElementById('inicio');
 
-const coopCards = document.querySelectorAll('.coop-card');
 const telemetryPanel = document.getElementById('telemetry-panel');
 const telemetryIframe = document.getElementById('telemetry-iframe');
 const telemetryLoader = document.getElementById('telemetry-loader');
@@ -272,68 +259,86 @@ function updateAuthState() {
     coopGrid.style.display = 'grid';
     telemetrySubtitle.style.display = 'block';
 
-    // OBTENER MEMBRESÍAS DE ORGANIZACIÓN DEL USUARIO
+    // OBTENER MEMBRESÍAS DE ORGANIZACIÓN DEL USUARIO DESDE CLERK
     const memberships = window.Clerk.user.organizationMemberships || [];
 
     // Verificar si el usuario es ADMINISTRADOR de alguna organización
-    // Clerk asigna roles como 'org:admin' o 'admin'
     const isAdmin = memberships.some(m => m.role === 'org:admin' || m.role === 'admin');
-
     if (isAdmin) {
       adminControlsDiv.style.display = 'block'; // Mostrar botón de gestión
     } else {
       adminControlsDiv.style.display = 'none';
     }
 
-    // Filtrar tarjetas de cooperativas en pantalla
-    let visibleCoopsCount = 0;
-    coopCards.forEach(card => {
-      const cardOrgId = card.getAttribute('data-org-id');
-      const coopId = card.getAttribute('data-coop-id');
-      const coopNameEl = card.querySelector('.coop-name');
+    // Limpiar grid para renderizado dinámico
+    coopGrid.innerHTML = '';
 
-      if (!coopNameEl.hasAttribute('data-original-name')) {
-        coopNameEl.setAttribute('data-original-name', coopNameEl.innerText);
+    if (memberships.length === 0) {
+      telemetrySubtitle.innerText = "No tienes asignada ninguna cooperativa. Solicita acceso a un administrador.";
+      coopGrid.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: var(--bg-secondary); border: 1px solid var(--border-glass); border-radius: var(--border-radius); box-shadow: var(--shadow-card);">
+          <i data-lucide="building-2" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+          <h4 style="color: var(--text-main); font-size: 1.2rem; margin-bottom: 8px; font-family: var(--font-headings);">Sin Cooperativas Asignadas</h4>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Tu cuenta de usuario no está asociada a ninguna organización en Clerk. Solicita a un administrador que te añada a una cooperativa.</p>
+        </div>
+      `;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      return;
+    }
+
+    telemetrySubtitle.innerText = "Seleccione una cooperativa para visualizar el panel de control y mediciones en tiempo real.";
+
+    // URL base por defecto de ThingsBoard
+    const defaultDashboardUrl = 'https://www.tecnomag.com.ar/dashboard/a40156d0-8c8b-11f1-8d8a-a962a2e26a4f';
+
+    // Renderizar dinámicamente UNA TARJETA por cada Organización a la que pertenece el usuario
+    memberships.forEach(membership => {
+      const org = membership.organization;
+      if (!org) return;
+
+      const orgName = org.name || 'Cooperativa';
+      const orgMeta = org.publicMetadata || org.privateMetadata || org.unsafeMetadata || {};
+      const orgDesc = orgMeta.description || `Estación de telemetría y submedidores en tiempo real (${orgName}).`;
+
+      // Resolver URL del panel para esta organización (desde metadata de org, metadata de usuario o fallback)
+      let dashboardUrl = orgMeta.tbDashboardUrl || orgMeta.dashboardUrl || orgMeta.url;
+      if (!dashboardUrl && (orgMeta.tbDashboardId || orgMeta.dashboardId)) {
+        dashboardUrl = `https://www.tecnomag.com.ar/dashboard/${orgMeta.tbDashboardId || orgMeta.dashboardId}`;
       }
-      const originalCoopName = coopNameEl.getAttribute('data-original-name').toLowerCase();
+      if (!dashboardUrl) {
+        dashboardUrl = defaultDashboardUrl;
+      }
 
-      // Verificar si el usuario pertenece a la organización por ID de Clerk, por slug o por nombre
-      const matchingMembership = memberships.find(m => {
-        const org = m.organization;
-        if (!org) return false;
+      // Crear tarjeta HTML dinámicamente
+      const card = document.createElement('div');
+      card.className = 'coop-card';
+      card.setAttribute('data-org-id', org.id);
 
-        // 1. Coincidencia por Org ID explícito de Clerk (ej: org_3GgM8vfNww8ljw4rZwclmr7vIfd)
-        if (cardOrgId && org.id === cardOrgId) return true;
+      const iconHtml = org.imageUrl 
+        ? `<img src="${org.imageUrl}" alt="${orgName}" style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover;">`
+        : `<i data-lucide="building-2"></i>`;
 
-        // 2. Coincidencia por data-coop-id en org.id o org.slug
-        if (coopId && (org.id === coopId || (org.slug && org.slug.toLowerCase() === coopId.toLowerCase()))) return true;
+      card.innerHTML = `
+        <div class="coop-icon">
+          ${iconHtml}
+        </div>
+        <h3 class="coop-name">${orgName}</h3>
+        <p class="coop-desc">${orgDesc}</p>
+        <div class="coop-badge">
+          <i data-lucide="radio" style="width: 14px; height: 14px;"></i> En línea
+        </div>
+      `;
 
-        // 3. Coincidencia por nombre de la organización
-        if (org.name && org.name.toLowerCase().trim() === originalCoopName.trim()) return true;
-
-        // 4. Coincidencia por slug reemplazando guiones
-        if (org.slug && org.slug.toLowerCase().replace(/-/g, ' ') === originalCoopName.trim()) return true;
-
-        return false;
+      // Agregar evento de clic para abrir el panel de la cooperativa
+      card.addEventListener('click', () => {
+        openTelemetryPanel(orgName, dashboardUrl);
       });
 
-      if (matchingMembership) {
-        card.style.display = 'flex';
-        visibleCoopsCount++;
-        // Mostrar dinámicamente el nombre actual de la Organización en Clerk (incluso si se le cambió el nombre)
-        if (matchingMembership.organization && matchingMembership.organization.name) {
-          coopNameEl.innerText = matchingMembership.organization.name;
-        }
-      } else {
-        card.style.display = 'none';
-      }
+      coopGrid.appendChild(card);
     });
 
-    // Si no pertenece a ninguna cooperativa todavía, mostrar un mensaje amistoso
-    if (visibleCoopsCount === 0) {
-      telemetrySubtitle.innerText = "No tienes asignada ninguna cooperativa. Solicita acceso a un administrador.";
-    } else {
-      telemetrySubtitle.innerText = "Seleccione una cooperativa para visualizar el panel de control y mediciones en tiempo real.";
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
     }
 
   } else {
@@ -342,6 +347,7 @@ function updateAuthState() {
     userButtonDiv.innerHTML = '';
     userButtonDiv.style.display = 'none';
     adminControlsDiv.style.display = 'none';
+    coopGrid.innerHTML = '';
 
     // Hide telemetry data
     authPanel.style.display = 'block';
@@ -542,74 +548,61 @@ async function getTbToken() {
   }
 }
 
-// Telemetry Iframe Flow Events
-function initTelemetryEvents() {
-  coopCards.forEach(card => {
-    card.addEventListener('click', async () => {
-      const coopId = card.getAttribute('data-coop-id');
-      const orgId = card.getAttribute('data-org-id');
-      const coopName = card.querySelector('.coop-name').innerText;
-      let url = (orgId && telemetryUrls[orgId]) || telemetryUrls[coopId];
+// Abrir el visor de telemetría a pantalla completa
+async function openTelemetryPanel(coopName, targetUrl) {
+  let url = targetUrl;
 
-      // Si la organización o el usuario en Clerk tienen una URL de panel personalizada en metadata, usarla
-      if (window.Clerk && window.Clerk.user) {
-        const memberships = window.Clerk.user.organizationMemberships || [];
-        const matchingMem = memberships.find(m => (orgId && m.organization.id === orgId) || (coopId && m.organization.slug === coopId));
-        if (matchingMem && matchingMem.organization) {
-          const orgMeta = matchingMem.organization.publicMetadata || matchingMem.organization.privateMetadata || {};
-          if (orgMeta.tbDashboardUrl || orgMeta.dashboardUrl) {
-            url = orgMeta.tbDashboardUrl || orgMeta.dashboardUrl;
-          }
-        }
+  // Si el usuario de Clerk tiene una URL de panel global configurada en su metadata personal, sobreescribir
+  if (window.Clerk && window.Clerk.user) {
+    const pMeta = window.Clerk.user.privateMetadata || {};
+    const pubMeta = window.Clerk.user.publicMetadata || {};
+    const unsMeta = window.Clerk.user.unsafeMetadata || {};
+    const customUrl = pMeta.tbDashboardUrl || pubMeta.tbDashboardUrl || unsMeta.tbDashboardUrl;
+    if (customUrl) {
+      url = customUrl;
+    }
+  }
 
-        const pMeta = window.Clerk.user.privateMetadata || {};
-        const pubMeta = window.Clerk.user.publicMetadata || {};
-        const unsMeta = window.Clerk.user.unsafeMetadata || {};
-        const customUrl = pMeta.tbDashboardUrl || pubMeta.tbDashboardUrl || unsMeta.tbDashboardUrl;
-        if (customUrl) {
-          url = customUrl;
-        }
-      }
+  if (!url) return;
 
-      if (!url) return;
+  // Desplegar el panel a pantalla completa e inhabilitar scroll de la página
+  telemetryPanel.classList.add('active');
+  document.body.classList.add('no-scroll');
+  document.documentElement.classList.add('no-scroll');
 
-      // Desplegar el panel a pantalla completa e inhabilitar scroll de la página
-      telemetryPanel.classList.add('active');
-      document.body.classList.add('no-scroll');
-      document.documentElement.classList.add('no-scroll');
+  // Show loader and update title
+  telemetryLoader.style.opacity = '1';
+  telemetryLoader.style.pointerEvents = 'all';
+  telemetryLoader.innerHTML = '<div class="spinner"></div><p>Cargando panel de telemedición...</p>';
+  activeCoopTitle.innerText = `Panel de Control - ${coopName}`;
 
-      // Show loader and update title
+  // Si es una URL de ThingsBoard (Cloud o instancia expuesta) y no tiene publicId explícito, adjuntar el token JWT del usuario
+  const isThingsBoard = url.includes('thingsboard') || url.includes('pinggy.net') || url.includes('ngrok-free.dev') || url.includes('tecnomag') || url.includes('/dashboard/') || url.includes('/dashboards');
+  if (isThingsBoard && !url.includes('publicId=')) {
+    const { token, error } = await getTbToken();
+    if (token) {
+      const connector = url.includes('?') ? '&' : '?';
+      url = `${url}${connector}accessToken=${token}&token=${token}&storeToken=true&_t=${Date.now()}`;
+    } else {
+      // Si no hay token del usuario, mostrar error descriptivo
       telemetryLoader.style.opacity = '1';
       telemetryLoader.style.pointerEvents = 'all';
-      telemetryLoader.innerHTML = '<div class="spinner"></div><p>Cargando panel de telemedición...</p>';
-      activeCoopTitle.innerText = `Panel de Control - ${coopName}`;
-
-      // Si es una URL de ThingsBoard (Cloud o instancia expuesta) y no tiene publicId explícito, adjuntar el token JWT del usuario
-      const isThingsBoard = url.includes('thingsboard') || url.includes('pinggy.net') || url.includes('ngrok-free.dev') || url.includes('tecnomag') || url.includes('/dashboard/') || url.includes('/dashboards');
-      if (isThingsBoard && !url.includes('publicId=')) {
-        const { token, error } = await getTbToken();
-        if (token) {
-          const connector = url.includes('?') ? '&' : '?';
-          url = `${url}${connector}accessToken=${token}&token=${token}&storeToken=true&_t=${Date.now()}`;
-        } else {
-          // Si no hay token del usuario, NO cargar el iframe sin token (para evitar cargar el localStorage del Admin)
-          telemetryLoader.style.opacity = '1';
-          telemetryLoader.style.pointerEvents = 'all';
-          telemetryLoader.innerHTML = `<div style="text-align: center; padding: 20px;"><i data-lucide="shield-alert" style="width: 48px; height: 48px; color: #ef4444; margin-bottom: 12px;"></i><p style="color: #f87171; font-weight: 600; font-size: 1rem; margin-bottom: 8px;">Sin vinculación con ThingsBoard</p><p style="color: #9ca3af; font-size: 0.85rem;">${error || 'Configura el tbUserId en la private_metadata de Clerk o iguala el email en ThingsBoard.'}</p></div>`;
-          if (typeof lucide !== 'undefined') lucide.createIcons();
-          telemetryIframe.src = 'about:blank';
-          return;
-        }
-      }
-
-      // Limpiar iframe previo para forzar a ThingsBoard a reiniciar su sesión local con el nuevo token
+      telemetryLoader.innerHTML = `<div style="text-align: center; padding: 20px;"><i data-lucide="shield-alert" style="width: 48px; height: 48px; color: #ef4444; margin-bottom: 12px;"></i><p style="color: #f87171; font-weight: 600; font-size: 1rem; margin-bottom: 8px;">Sin vinculación con ThingsBoard</p><p style="color: #9ca3af; font-size: 0.85rem;">${error || 'Configura el tbUserId en la private_metadata de Clerk o iguala el email en ThingsBoard.'}</p></div>`;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
       telemetryIframe.src = 'about:blank';
-      setTimeout(() => {
-        telemetryIframe.src = url;
-      }, 100);
-    });
-  });
+      return;
+    }
+  }
 
+  // Limpiar iframe previo para forzar a ThingsBoard a reiniciar su sesión local con el nuevo token
+  telemetryIframe.src = 'about:blank';
+  setTimeout(() => {
+    telemetryIframe.src = url;
+  }, 100);
+}
+
+// Telemetry Iframe Flow Events
+function initTelemetryEvents() {
   // Hide loader once iframe is fully loaded
   telemetryIframe.addEventListener('load', () => {
     telemetryLoader.style.opacity = '0';
