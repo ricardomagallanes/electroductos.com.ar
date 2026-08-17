@@ -81,6 +81,7 @@ const thingsboardDashboardId = 'a40156d0-8c8b-11f1-8d8a-a962a2e26a4f';
 const telemetryUrls = {
   'coop-a': 'https://shenmu.usriot.com/share?s=fcc9ub9b1z&a=aHR0cHM6Ly9zaGVubXUudXNyaW90LmNvbS9zaGFyZQ==&l=en',
   'coop-b': 'https://www.tecnomag.com.ar/dashboard/a40156d0-8c8b-11f1-8d8a-a962a2e26a4f',
+  'org_3GgM8vfNww8ljw4rZwclmr7vIfd': 'https://www.tecnomag.com.ar/dashboard/a40156d0-8c8b-11f1-8d8a-a962a2e26a4f',
   'coop-c': 'https://liberalistic-grinningly-caylee.ngrok-free.dev/nodered/ui/#!/0?socketid=XYKQyYr-wwbjIbqvAAAJ',
   'coop-d': 'https://f0a509af.us2a.app.preset.io/superset/embedded/0104b04a-5f7d-4f0c-b533-8df57fea43ee?standalone=true'
 };
@@ -274,9 +275,6 @@ function updateAuthState() {
     // OBTENER MEMBRESÍAS DE ORGANIZACIÓN DEL USUARIO
     const memberships = window.Clerk.user.organizationMemberships || [];
 
-    // Obtener nombres/slugs de las organizaciones del usuario en minúsculas para comparar
-    const userOrgs = memberships.map(m => m.organization.name.toLowerCase());
-
     // Verificar si el usuario es ADMINISTRADOR de alguna organización
     // Clerk asigna roles como 'org:admin' o 'admin'
     const isAdmin = memberships.some(m => m.role === 'org:admin' || m.role === 'admin');
@@ -290,12 +288,42 @@ function updateAuthState() {
     // Filtrar tarjetas de cooperativas en pantalla
     let visibleCoopsCount = 0;
     coopCards.forEach(card => {
-      const coopName = card.querySelector('.coop-name').innerText.toLowerCase(); // ej: "cooperativa a"
+      const cardOrgId = card.getAttribute('data-org-id');
+      const coopId = card.getAttribute('data-coop-id');
+      const coopNameEl = card.querySelector('.coop-name');
 
-      // Si el usuario pertenece a la organización correspondiente, mostrar la tarjeta. Si no, ocultarla.
-      if (userOrgs.includes(coopName)) {
+      if (!coopNameEl.hasAttribute('data-original-name')) {
+        coopNameEl.setAttribute('data-original-name', coopNameEl.innerText);
+      }
+      const originalCoopName = coopNameEl.getAttribute('data-original-name').toLowerCase();
+
+      // Verificar si el usuario pertenece a la organización por ID de Clerk, por slug o por nombre
+      const matchingMembership = memberships.find(m => {
+        const org = m.organization;
+        if (!org) return false;
+
+        // 1. Coincidencia por Org ID explícito de Clerk (ej: org_3GgM8vfNww8ljw4rZwclmr7vIfd)
+        if (cardOrgId && org.id === cardOrgId) return true;
+
+        // 2. Coincidencia por data-coop-id en org.id o org.slug
+        if (coopId && (org.id === coopId || (org.slug && org.slug.toLowerCase() === coopId.toLowerCase()))) return true;
+
+        // 3. Coincidencia por nombre de la organización
+        if (org.name && org.name.toLowerCase().trim() === originalCoopName.trim()) return true;
+
+        // 4. Coincidencia por slug reemplazando guiones
+        if (org.slug && org.slug.toLowerCase().replace(/-/g, ' ') === originalCoopName.trim()) return true;
+
+        return false;
+      });
+
+      if (matchingMembership) {
         card.style.display = 'flex';
         visibleCoopsCount++;
+        // Mostrar dinámicamente el nombre actual de la Organización en Clerk (incluso si se le cambió el nombre)
+        if (matchingMembership.organization && matchingMembership.organization.name) {
+          coopNameEl.innerText = matchingMembership.organization.name;
+        }
       } else {
         card.style.display = 'none';
       }
@@ -519,11 +547,21 @@ function initTelemetryEvents() {
   coopCards.forEach(card => {
     card.addEventListener('click', async () => {
       const coopId = card.getAttribute('data-coop-id');
+      const orgId = card.getAttribute('data-org-id');
       const coopName = card.querySelector('.coop-name').innerText;
-      let url = telemetryUrls[coopId];
+      let url = (orgId && telemetryUrls[orgId]) || telemetryUrls[coopId];
 
-      // Si el usuario de Clerk tiene una URL de panel específica configurada en su metadata, usar esa
+      // Si la organización o el usuario en Clerk tienen una URL de panel personalizada en metadata, usarla
       if (window.Clerk && window.Clerk.user) {
+        const memberships = window.Clerk.user.organizationMemberships || [];
+        const matchingMem = memberships.find(m => (orgId && m.organization.id === orgId) || (coopId && m.organization.slug === coopId));
+        if (matchingMem && matchingMem.organization) {
+          const orgMeta = matchingMem.organization.publicMetadata || matchingMem.organization.privateMetadata || {};
+          if (orgMeta.tbDashboardUrl || orgMeta.dashboardUrl) {
+            url = orgMeta.tbDashboardUrl || orgMeta.dashboardUrl;
+          }
+        }
+
         const pMeta = window.Clerk.user.privateMetadata || {};
         const pubMeta = window.Clerk.user.publicMetadata || {};
         const unsMeta = window.Clerk.user.unsafeMetadata || {};
