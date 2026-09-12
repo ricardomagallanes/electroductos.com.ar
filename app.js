@@ -289,7 +289,7 @@ function updateAuthState() {
     telemetrySubtitle.innerText = "Seleccione una cooperativa para visualizar el panel de control y mediciones en tiempo real.";
 
     // URL base por defecto de ThingsBoard
-    const defaultDashboardUrl = 'https://www.tecnomag.com.ar/dashboard/a40156d0-8c8b-11f1-8d8a-a962a2e26a4f';
+    const defaultDashboardUrl = 'https://thingsboard.tecnomag.com.ar/dashboard/8d2a42a0-ad97-11f1-8128-251aef2557f2';
 
     // Renderizar dinámicamente UNA TARJETA por cada Organización a la que pertenece el usuario
     memberships.forEach(membership => {
@@ -303,7 +303,7 @@ function updateAuthState() {
       // Resolver URL del panel para esta organización (desde metadata de org, metadata de usuario o fallback)
       let dashboardUrl = orgMeta.tbDashboardUrl || orgMeta.dashboardUrl || orgMeta.url;
       if (!dashboardUrl && (orgMeta.tbDashboardId || orgMeta.dashboardId)) {
-        dashboardUrl = `https://www.tecnomag.com.ar/dashboard/${orgMeta.tbDashboardId || orgMeta.dashboardId}`;
+        dashboardUrl = `https://thingsboard.tecnomag.com.ar/dashboard/${orgMeta.tbDashboardId || orgMeta.dashboardId}`;
       }
       if (!dashboardUrl) {
         dashboardUrl = defaultDashboardUrl;
