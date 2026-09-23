@@ -303,6 +303,7 @@ const WHATSAPP_PHONE = '5493516336043';
 
 // Initialize Website
 document.addEventListener('DOMContentLoaded', () => {
+  initWelcomePreloader();
   renderProducts('all');
   initNavigation();
   initMobileMenu();
@@ -337,6 +338,39 @@ document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
   }
 });
+
+// Modern Industrial Welcome Preloader Animation
+function initWelcomePreloader() {
+  const preloader = document.getElementById('welcome-preloader');
+  const progressBar = document.getElementById('preloader-progress');
+  const statusText = document.getElementById('preloader-status-text');
+
+  if (!preloader || !progressBar) return;
+
+  const messages = [
+    { p: 25, text: 'Iniciando sistemas de ingeniería...' },
+    { p: 60, text: 'Cargando catálogo técnico de pilares...' },
+    { p: 90, text: 'Verificando especificaciones y planos...' },
+    { p: 100, text: '¡Bienvenido a Electroductos!' }
+  ];
+
+  let step = 0;
+  const interval = setInterval(() => {
+    if (step < messages.length) {
+      progressBar.style.width = messages[step].p + '%';
+      if (statusText) statusText.innerText = messages[step].text;
+      step++;
+    } else {
+      clearInterval(interval);
+      setTimeout(() => {
+        preloader.classList.add('fade-out');
+        setTimeout(() => {
+          preloader.style.display = 'none';
+        }, 600);
+      }, 350);
+    }
+  }, 220);
+}
 
 // Render products dynamically based on group filter
 function renderProducts(groupFilter) {
