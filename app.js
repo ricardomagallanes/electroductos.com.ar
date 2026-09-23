@@ -304,7 +304,6 @@ const WHATSAPP_PHONE = '5493516336043';
 // Initialize Website
 document.addEventListener('DOMContentLoaded', () => {
   initWelcomePreloader();
-  initThemeSwitcher();
   renderProducts('all');
   initNavigation();
   initMobileMenu();
@@ -854,66 +853,6 @@ function initTelemetryEvents() {
     telemetryPanel.classList.remove('active');
     telemetryIframe.src = '';
     document.body.classList.remove('no-scroll');
-  });
-}
-
-// Interactive Palette & Theme Switcher
-function initThemeSwitcher() {
-  const widget = document.getElementById('palette-switcher-widget');
-  const toggleBtn = document.getElementById('palette-toggle-btn');
-  const closeBtn = document.getElementById('palette-close-btn');
-  const optButtons = document.querySelectorAll('.palette-opt-btn');
-
-  if (!widget || !toggleBtn) return;
-
-  const THEMES = ['theme-titanio', 'theme-blueprint', 'theme-slate', 'theme-foundry'];
-  const savedTheme = localStorage.getItem('electroductos-theme') || 'theme-titanio';
-
-  function applyTheme(themeClass) {
-    THEMES.forEach(t => document.body.classList.remove(t));
-    document.body.classList.add(themeClass);
-    localStorage.setItem('electroductos-theme', themeClass);
-
-    optButtons.forEach(btn => {
-      if (btn.getAttribute('data-theme') === themeClass) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
-  }
-
-  // Apply initial theme
-  applyTheme(savedTheme);
-
-  // Toggle switcher menu
-  toggleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    widget.classList.toggle('open');
-  });
-
-  if (closeBtn) {
-    closeBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      widget.classList.remove('open');
-    });
-  }
-
-  // Handle clicking palette options
-  optButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const selected = btn.getAttribute('data-theme');
-      if (selected) {
-        applyTheme(selected);
-      }
-    });
-  });
-
-  // Close when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!widget.contains(e.target)) {
-      widget.classList.remove('open');
-    }
   });
 }
 
