@@ -333,6 +333,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Init Clerk Authentication
   initClerk();
 
+  // Inject Product Schema.org for Rich Results
+  injectProductSchemas();
+
   // Initialize Lucide Icons
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
@@ -930,5 +933,46 @@ function initTelemetryEvents() {
     window.closeTelemetryPanelDirect();
   });
 }
+
+// Inject JSON-LD Schema.org for all products in catalog
+function injectProductSchemas() {
+  if (typeof products === 'undefined' || !Array.isArray(products)) return;
+
+  const productGraph = products.map(p => ({
+    "@type": "Product",
+    "name": p.name,
+    "image": `https://www.electroductos.com.ar/${p.image}`,
+    "description": p.description,
+    "sku": p.code,
+    "mpn": p.code,
+    "brand": {
+      "@type": "Brand",
+      "name": "Electroductos de Argentina S.A."
+    },
+    "manufacturer": {
+      "@type": "Organization",
+      "name": "Electroductos de Argentina S.A."
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": `https://www.electroductos.com.ar/#productos`,
+      "priceCurrency": "ARS",
+      "availability": "https://schema.org/InStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "Electroductos de Argentina S.A."
+      }
+    }
+  }));
+
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.text = JSON.stringify({
+    "@context": "https://schema.org",
+    "@graph": productGraph
+  });
+  document.head.appendChild(script);
+}
+
 
 
