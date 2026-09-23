@@ -2,25 +2,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 :root {
-  /* Color Palette - Modern Industrial Studio (High Contrast for White Blueprints) */
-  --bg-primary: #F1F4F8;          /* Fondo base gris técnico perla moderno */
-  --bg-secondary: #E2E8F0;        /* Contenedores secundarios y toolbars */
-  --bg-tertiary: #CBD5E1;         /* Bordes y separadores técnicos */
-  --bg-card: #FFFFFF;             /* Tarjetas blancas luminosas */
-  --bg-canvas: #1E293B;           /* Superficie contrastante grafito para montaje del plano */
-  --bg-canvas-border: #334155;
-  --bg-dark: #0F172A;             /* Antracita industrial profundo */
+  /* Color Palette - Modern Industrial Titanio Studio */
+  --bg-primary: #E9ECEF;          /* Fondo base gris titanio suave y agradable */
+  --bg-secondary: #DEE2E6;        /* Contenedores secundarios, toolbars y franjas */
+  --bg-tertiary: #CED4DA;         /* Bordes estructurados y separadores */
+  --bg-card: #F8F9FA;             /* Tarjetas gris platino cálido (no blanco puro) */
+  --bg-card-inner: #EDF2F7;       /* Paneles internos de tarjetas */
+  --bg-hero: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); /* Hero de alto impacto grafito industrial */
+  --bg-canvas: #151D2A;           /* Mesa de dibujo técnico donde se monta el plano */
+  --bg-dark: #0F172A;             /* Antracita industrial */
   
-  --border-light: #CBD5E1;
-  --border-focus: #94A3B8;
-  --border-industrial: #E2E8F0;
+  --border-light: #CED4DA;
+  --border-focus: #ADB5BD;
+  --border-industrial: #DEE2E6;
 
   /* Logo Palette Colors */
   --color-primary: #EB5B28;        /* Naranja corporativo del logo */
   --color-primary-rgb: 235, 91, 40;
   --color-primary-hover: #D44B1B;
-  --color-primary-light: rgba(235, 91, 40, 0.09);
-  --color-primary-border: rgba(235, 91, 40, 0.25);
+  --color-primary-light: rgba(235, 91, 40, 0.12);
+  --color-primary-border: rgba(235, 91, 40, 0.3);
 
   --color-secondary: #C84617;      /* Óxido profundo */
   --color-terracotta: #A53713;     /* Terracota del logo */
@@ -31,7 +32,7 @@
   --color-whatsapp: #25D366;
   --color-whatsapp-hover: #20BA5A;
 
-  --text-main: #0F172A;
+  --text-main: #1E293B;
   --text-secondary: #334155;
   --text-muted: #64748B;
   --text-light: #94A3B8;
@@ -273,24 +274,29 @@ a {
   color: var(--color-primary);
 }
 
-/* Hero Section */
+/* Hero Section - High-End Industrial Architecture */
 .hero {
-  padding-top: calc(var(--header-height) + 40px);
-  padding-bottom: 50px;
-  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
-  border-bottom: 1px solid var(--border-light);
+  padding-top: calc(var(--header-height) + 50px);
+  padding-bottom: 70px;
+  background: linear-gradient(145deg, #1A2333 0%, #0F172A 60%, #151D2A 100%);
+  border-bottom: 1px solid #334155;
   position: relative;
   overflow: hidden;
+  color: #FFFFFF;
 }
 
-.hero::after {
+.hero::before {
   content: '';
   position: absolute;
   top: 0;
+  left: 0;
   right: 0;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(235, 91, 40, 0.04) 0%, transparent 70%);
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 80% 20%, rgba(235, 91, 40, 0.15) 0%, transparent 50%),
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 30px 30px, 30px 30px;
   pointer-events: none;
 }
 
@@ -298,43 +304,48 @@ a {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 24px;
+  position: relative;
+  z-index: 2;
 }
 
 .hero-tag {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: var(--color-primary-light);
-  border: 1px solid var(--color-primary-border);
-  color: var(--color-primary);
-  padding: 6px 14px;
+  background: rgba(235, 91, 40, 0.15);
+  border: 1px solid rgba(235, 91, 40, 0.4);
+  color: #FF8A5B;
+  padding: 6px 16px;
   border-radius: 30px;
   font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .hero h1 {
-  font-size: 3.2rem;
+  font-size: 3.4rem;
   line-height: 1.15;
-  margin-bottom: 20px;
-  max-width: 860px;
-  color: var(--color-dark);
+  margin-bottom: 22px;
+  max-width: 900px;
+  color: #FFFFFF;
+  letter-spacing: -0.03em;
 }
 
 .hero h1 span {
-  color: var(--color-primary);
+  background: linear-gradient(135deg, #FF7A45 0%, #EB5B28 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   position: relative;
 }
 
 .hero-description {
   font-size: 1.15rem;
-  color: var(--text-muted);
-  max-width: 720px;
-  margin-bottom: 32px;
-  line-height: 1.6;
+  color: #CBD5E1;
+  max-width: 740px;
+  margin-bottom: 36px;
+  line-height: 1.65;
 }
 
 .hero-cta {
@@ -343,14 +354,26 @@ a {
   flex-wrap: wrap;
 }
 
+.hero .btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hero .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #FFFFFF;
+}
+
 /* Quick specs banner in Hero */
 .hero-specs-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-  margin-top: 48px;
-  padding-top: 32px;
-  border-top: 1px solid var(--border-light);
+  gap: 20px;
+  margin-top: 50px;
+  padding-top: 36px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .hero-spec-item {
@@ -360,29 +383,29 @@ a {
 }
 
 .hero-spec-icon {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 10px;
-  background: #FFFFFF;
-  border: 1px solid var(--border-light);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-primary);
-  box-shadow: var(--shadow-subtle);
+  color: #FF8A5B;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   flex-shrink: 0;
 }
 
 .hero-spec-info h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--color-dark);
+  color: #F8FAFC;
   margin-bottom: 2px;
 }
 
 .hero-spec-info p {
-  font-size: 0.8rem;
-  color: var(--text-muted);
+  font-size: 0.82rem;
+  color: #94A3B8;
 }
 
 /* Main Content Area */
@@ -423,10 +446,11 @@ main {
   flex-wrap: wrap;
   gap: 16px;
   padding: 16px 20px;
-  background: var(--bg-secondary);
+  background: #E2E8F0;
   border: 1px solid var(--border-light);
   border-radius: var(--border-radius);
   margin-bottom: 36px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .catalog-filters {
@@ -440,14 +464,14 @@ main {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
-  background: #FFFFFF;
+  padding: 9px 18px;
+  background: #F8FAFC;
   border: 1px solid var(--border-light);
   color: var(--text-secondary);
   border-radius: 6px;
   font-family: var(--font-body);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: var(--transition-smooth);
 }
@@ -455,13 +479,14 @@ main {
 .filter-btn:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
+  background: #FFFFFF;
 }
 
 .filter-btn.active {
   background: var(--color-primary);
   color: #FFFFFF;
   border-color: var(--color-primary);
-  box-shadow: 0 2px 8px rgba(235, 91, 40, 0.25);
+  box-shadow: 0 2px 8px rgba(235, 91, 40, 0.3);
 }
 
 .catalog-download-box {
@@ -481,13 +506,13 @@ main {
   font-weight: 700;
   font-size: 0.9rem;
   transition: var(--transition-smooth);
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.15);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.2);
 }
 
 .btn-download-catalog:hover {
   background: var(--color-primary);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(235, 91, 40, 0.3);
+  box-shadow: 0 6px 16px rgba(235, 91, 40, 0.35);
 }
 
 /* Products Grid */
@@ -497,9 +522,9 @@ main {
   gap: 32px;
 }
 
-/* Product Card - Industrial Technical Layout */
+/* Product Card - Warm Platinum Industrial Layout */
 .product-card {
-  background: var(--bg-card);
+  background: #FFFFFF;
   border: 1px solid var(--border-light);
   border-radius: var(--border-radius);
   overflow: hidden;
@@ -519,9 +544,9 @@ main {
 /* Technical Image Container - High Contrast Drafting Studio */
 .product-image-container {
   height: 300px;
-  background: #1E293B;
+  background: #151D2A;
   background-image: 
-    radial-gradient(circle at 50% 50%, #293548 0%, #172033 100%),
+    radial-gradient(circle at 50% 50%, #202938 0%, #111722 100%),
     linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 100% 100%, 20px 20px, 20px 20px;
@@ -530,7 +555,7 @@ main {
   align-items: center;
   justify-content: center;
   padding: 18px;
-  border-bottom: 2px solid #E2E8F0;
+  border-bottom: 2px solid #CBD5E1;
   cursor: pointer;
   overflow: hidden;
 }
@@ -627,6 +652,7 @@ main {
 /* Product Info */
 .product-info {
   padding: 24px;
+  background: #F8FAFC;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -634,7 +660,7 @@ main {
 
 .product-plan-info {
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-primary);
   margin-bottom: 6px;
   text-transform: uppercase;
@@ -657,10 +683,10 @@ main {
 
 /* Technical Specs List */
 .product-specs-box {
-  background: var(--bg-secondary);
+  background: #EDF2F7;
   border: 1px solid var(--border-light);
   border-radius: var(--border-radius-sm);
-  padding: 12px 14px;
+  padding: 14px 16px;
   margin-bottom: 20px;
 }
 
@@ -680,15 +706,15 @@ main {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .product-specs-list li {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-secondary);
   display: flex;
   align-items: flex-start;
-  gap: 6px;
+  gap: 8px;
   line-height: 1.4;
 }
 
@@ -709,12 +735,12 @@ main {
 }
 
 .btn-card-sheet {
-  background: #FFFFFF;
+  background: #EDF2F7;
   border: 1px solid var(--border-light);
   color: var(--color-dark);
   font-size: 0.82rem;
-  font-weight: 600;
-  padding: 9px 12px;
+  font-weight: 700;
+  padding: 10px 12px;
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -725,7 +751,7 @@ main {
 }
 
 .btn-card-sheet:hover {
-  background: var(--bg-secondary);
+  background: #E2E8F0;
   border-color: var(--color-dark);
 }
 
@@ -777,16 +803,17 @@ main {
 }
 
 .modal-content-wrap {
-  background: #FFFFFF;
+  background: #F8FAFC;
   border-radius: var(--border-radius);
   width: 100%;
   max-width: 980px;
   max-height: 92vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
   overflow: hidden;
   animation: modalScaleUp 0.3s ease;
+  border: 1px solid #334155;
 }
 
 @keyframes modalScaleUp {
@@ -802,7 +829,7 @@ main {
 
 .modal-header {
   padding: 18px 24px;
-  background: #FFFFFF;
+  background: #EDF2F7;
   border-bottom: 1px solid var(--border-light);
   display: flex;
   align-items: center;
@@ -821,7 +848,7 @@ main {
 }
 
 .modal-close-btn {
-  background: var(--bg-secondary);
+  background: #E2E8F0;
   border: 1px solid var(--border-light);
   color: var(--text-secondary);
   width: 36px;
@@ -843,11 +870,12 @@ main {
 .modal-body {
   padding: 24px;
   overflow-y: auto;
-  background: #1E293B;
+  background: #151D2A;
   background-image: 
+    radial-gradient(circle at 50% 50%, #202938 0%, #111722 100%),
     linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-size: 100% 100%, 24px 24px, 24px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -857,14 +885,14 @@ main {
 .modal-image-preview {
   max-width: 100%;
   border-radius: 6px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.2);
   border: 4px solid #FFFFFF;
   background: #FFFFFF;
 }
 
 .modal-footer {
-  padding: 14px 24px;
-  background: #FFFFFF;
+  padding: 16px 24px;
+  background: #EDF2F7;
   border-top: 1px solid var(--border-light);
   display: flex;
   justify-content: space-between;
@@ -1158,7 +1186,7 @@ main {
 }
 
 .coop-card {
-  background: #FFFFFF;
+  background: #F8FAFC;
   border: 1px solid var(--border-light);
   border-radius: var(--border-radius);
   padding: 24px;
