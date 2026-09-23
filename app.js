@@ -338,18 +338,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-let currentViewModel = 'blueprint'; // 'blueprint' (CAD) or 'classic' (paper)
-
 // Render products dynamically based on group filter
 function renderProducts(groupFilter) {
   if (!grid) return;
   grid.innerHTML = '';
 
-  const activeFilter = groupFilter || 'all';
-
-  const filtered = activeFilter === 'all'
+  const filtered = groupFilter === 'all'
     ? products
-    : products.filter(p => p.group === activeFilter);
+    : products.filter(p => p.group === groupFilter);
 
   if (filtered.length === 0) {
     grid.innerHTML = `
@@ -368,15 +364,6 @@ function renderProducts(groupFilter) {
     card.className = 'product-card';
     card.setAttribute('data-id', product.id);
 
-    // Pick image according to currentViewModel
-    const imgSrc = currentViewModel === 'blueprint'
-      ? `assets/catalogo/pilares/${product.id}-blueprint.png`
-      : product.image;
-
-    const bgCanvasStyle = currentViewModel === 'blueprint'
-      ? 'background: #0B192C; border-bottom: 2px solid #E2E8F0;'
-      : 'background: #F8FAFC; border-bottom: 2px solid #E2E8F0;';
-
     // Render 4 main specs
     const specsHtml = product.specs.slice(0, 4).map(spec => `
       <li>
@@ -386,12 +373,12 @@ function renderProducts(groupFilter) {
     `).join('');
 
     card.innerHTML = `
-      <div class="product-image-container" style="${bgCanvasStyle}" onclick="openTechnicalModal('${product.id}')" title="Clic para ampliar plano constructivo">
+      <div class="product-image-container" onclick="openTechnicalModal('${product.id}')" title="Clic para ampliar plano constructivo">
         <div class="product-badge-group">
           <span class="product-badge-code">${product.code}</span>
           <span class="product-badge-type">${product.tag}</span>
         </div>
-        <img src="${imgSrc}" alt="${product.name}" class="product-img" loading="lazy">
+        <img src="${product.image}" alt="${product.name}" class="product-img" loading="lazy">
         <div class="product-zoom-hint">
           <i data-lucide="zoom-in" style="width: 14px; height: 14px;"></i> Ver Plano
         </div>
@@ -432,34 +419,6 @@ function renderProducts(groupFilter) {
 
 // Navigation & Routing Logic
 function initNavigation() {
-  // View mode switcher (CAD Blueprint vs Classic White Paper)
-  const btnBlueprint = document.getElementById('btn-view-blueprint');
-  const btnClassic = document.getElementById('btn-view-classic');
-
-  if (btnBlueprint && btnClassic) {
-    btnBlueprint.addEventListener('click', () => {
-      currentViewModel = 'blueprint';
-      btnBlueprint.style.background = '#0B192C';
-      btnBlueprint.style.color = '#FFFFFF';
-      btnClassic.style.background = 'transparent';
-      btnClassic.style.color = 'var(--text-secondary)';
-      const activeFilterBtn = document.querySelector('.filter-btn.active');
-      const activeFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'all';
-      renderProducts(activeFilter);
-    });
-
-    btnClassic.addEventListener('click', () => {
-      currentViewModel = 'classic';
-      btnClassic.style.background = '#0B192C';
-      btnClassic.style.color = '#FFFFFF';
-      btnBlueprint.style.background = 'transparent';
-      btnBlueprint.style.color = 'var(--text-secondary)';
-      const activeFilterBtn = document.querySelector('.filter-btn.active');
-      const activeFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'all';
-      renderProducts(activeFilter);
-    });
-  }
-
   // Filter buttons in catalog
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -572,15 +531,11 @@ window.openTechnicalModal = (productId) => {
   const prod = products.find(p => p.id === productId);
   if (!prod) return;
 
-  const sheetSrc = currentViewModel === 'blueprint'
-    ? `assets/catalogo/pilares/${prod.id}-ficha-blueprint.png`
-    : prod.sheet;
-
   modalProductTitle.innerText = `${prod.name}`;
   modalProductSubtitle.innerText = `${prod.plan} | ${prod.tag}`;
-  modalProductImg.src = sheetSrc;
+  modalProductImg.src = prod.sheet;
   modalProductImg.alt = prod.name;
-  modalDownloadLink.href = sheetSrc;
+  modalDownloadLink.href = prod.sheet;
   modalDownloadLink.setAttribute('download', `Plano-${prod.code}-Electroductos.png`);
 
   modalWhatsappInquire.onclick = () => {
