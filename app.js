@@ -786,7 +786,7 @@ function renderUserCooperatives() {
       role: 'Visualizador',
       imageUrl: 'assets/logo.png',
       metadata: {
-        dashboardUrl: 'https://demo.thingsboard.io/dashboards'
+        dashboardUrl: 'https://thingsboard.tecnomag.com.ar/dashboard/8d2a42a0-ad97-11f1-8128-251aef2557f2'
       }
     });
   }
@@ -805,7 +805,7 @@ function renderUserCooperatives() {
       <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">
         Acceso directo al panel SCADA / Telemetría IoT en tiempo real para transformadores y redes de distribución.
       </p>
-      <button class="btn btn-primary" style="width: 100%; font-size: 0.88rem; padding: 10px;" onclick="openTelemetryPanel('${org.name}', '${org.metadata.dashboardUrl || ''}')">
+      <button class="btn btn-primary" style="width: 100%; font-size: 0.88rem; padding: 10px;" onclick="openTelemetryPanel('${org.name}', '${org.metadata.dashboardUrl || org.metadata.tbDashboardUrl || ''}')">
         <i data-lucide="activity" style="width: 16px; height: 16px;"></i> Ver Panel en Tiempo Real
       </button>
     `;
@@ -817,29 +817,106 @@ function renderUserCooperatives() {
   }
 }
 
+// Obtener token JWT de ThingsBoard desde el endpoint seguro /api/tb-token
+async function getTbToken() {
+  try {
+    const headers = {};
+
+    // Enviar el token de sesión de Clerk para validar la identidad y permisos del usuario
+    if (window.Clerk && window.Clerk.session) {
+      const clerkToken = await window.Clerk.session.getToken();
+      if (clerkToken) {
+        headers['Authorization'] = `Bearer ${clerkToken}`;
+      }
+    }
+
+    const res = await fetch('/api/tb-token', { method: 'GET', headers });
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.warn('Error backend al solicitar token:', data);
+      return { 
+        token: null, 
+        error: data.details ? `${data.error}: ${data.details}` : (data.error || 'Error de autenticación con ThingsBoard') 
+      };
+    }
+
+    return { token: data.token, error: null };
+  } catch (err) {
+    console.error('Error al conectar con /api/tb-token:', err);
+    return { token: null, error: 'No se pudo contactar con la API de autenticación.' };
+  }
+}
+
 // Telemetry Fullscreen Viewer
 async function openTelemetryPanel(coopName, targetUrl) {
-  let url = targetUrl || 'https://demo.thingsboard.io/dashboards';
+  let url = targetUrl;
+
+  // Si no hay targetUrl o viene vacía, buscar en metadatos del usuario o fallback oficial
+  const defaultDashboardUrl = 'https://thingsboard.tecnomag.com.ar/dashboard/8d2a42a0-ad97-11f1-8128-251aef2557f2';
+
+  if (!url) {
+    url = defaultDashboardUrl;
+  }
 
   if (window.Clerk && window.Clerk.user) {
     const pMeta = window.Clerk.user.privateMetadata || {};
     const pubMeta = window.Clerk.user.publicMetadata || {};
-    const customUrl = pMeta.tbDashboardUrl || pubMeta.tbDashboardUrl;
+    const unsMeta = window.Clerk.user.unsafeMetadata || {};
+    const customUrl = pMeta.tbDashboardUrl || pubMeta.tbDashboardUrl || unsMeta.tbDashboardUrl;
     if (customUrl) url = customUrl;
   }
 
   telemetryPanel.classList.add('active');
   document.body.classList.add('no-scroll');
+  document.documentElement.classList.add('no-scroll');
 
   telemetryLoader.style.opacity = '1';
   telemetryLoader.style.pointerEvents = 'all';
+  telemetryLoader.innerHTML = '<div class="spinner"></div><p>Cargando panel de telemedición y autenticando sesión...</p>';
   activeCoopTitle.innerText = coopName;
+
+  // Si es un panel de ThingsBoard y no es un dashboard público anónimo, obtener e inyectar el token JWT
+  const isThingsBoard = url.includes('thingsboard') || url.includes('tecnomag') || url.includes('/dashboard/') || url.includes('/dashboards');
+  if (isThingsBoard && !url.includes('publicId=')) {
+    const { token, error } = await getTbToken();
+    if (token) {
+      const connector = url.includes('?') ? '&' : '?';
+      url = `${url}${connector}accessToken=${token}&token=${token}&storeToken=true&_t=${Date.now()}`;
+    } else {
+      // Si no se pudo obtener token, informar claramente en el loader
+      telemetryLoader.style.opacity = '1';
+      telemetryLoader.style.pointerEvents = 'all';
+      telemetryLoader.innerHTML = `
+        <div style="text-align: center; padding: 24px; max-width: 480px; margin: 0 auto;">
+          <i data-lucide="shield-alert" style="width: 44px; height: 44px; color: #ef4444; margin-bottom: 12px;"></i>
+          <p style="color: #f87171; font-weight: 700; font-size: 1.05rem; margin-bottom: 8px;">Error de Autenticación con ThingsBoard</p>
+          <p style="color: #94a3b8; font-size: 0.88rem; line-height: 1.5; margin-bottom: 16px;">
+            ${error || 'No se pudo vincular automáticamente la sesión de usuario con ThingsBoard.'}
+          </p>
+          <button class="btn btn-secondary" onclick="closeTelemetryPanelDirect()" style="font-size: 0.85rem; padding: 8px 16px;">
+            Cerrar Visor
+          </button>
+        </div>
+      `;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      telemetryIframe.src = 'about:blank';
+      return;
+    }
+  }
 
   telemetryIframe.src = 'about:blank';
   setTimeout(() => {
     telemetryIframe.src = url;
   }, 100);
 }
+
+window.closeTelemetryPanelDirect = function() {
+  if (telemetryPanel) telemetryPanel.classList.remove('active');
+  if (telemetryIframe) telemetryIframe.src = '';
+  document.body.classList.remove('no-scroll');
+  document.documentElement.classList.remove('no-scroll');
+};
 
 function initTelemetryEvents() {
   if (!telemetryIframe || !closeIframeBtn) return;
@@ -850,9 +927,8 @@ function initTelemetryEvents() {
   });
 
   closeIframeBtn.addEventListener('click', () => {
-    telemetryPanel.classList.remove('active');
-    telemetryIframe.src = '';
-    document.body.classList.remove('no-scroll');
+    window.closeTelemetryPanelDirect();
   });
 }
+
 
