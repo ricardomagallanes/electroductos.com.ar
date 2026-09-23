@@ -2,60 +2,146 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 :root {
-  /* Color Palette - Modern Industrial Titanio Studio */
-  --bg-primary: #E9ECEF;          /* Fondo base gris titanio suave y agradable */
-  --bg-secondary: #DEE2E6;        /* Contenedores secundarios, toolbars y franjas */
-  --bg-tertiary: #CED4DA;         /* Bordes estructurados y separadores */
-  --bg-card: #F8F9FA;             /* Tarjetas gris platino cálido (no blanco puro) */
-  --bg-card-inner: #EDF2F7;       /* Paneles internos de tarjetas */
-  --bg-hero: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); /* Hero de alto impacto grafito industrial */
-  --bg-canvas: #151D2A;           /* Mesa de dibujo técnico donde se monta el plano */
-  --bg-dark: #0F172A;             /* Antracita industrial */
-  
+  /* Default Color Palette (Theme 1: Titanio Industrial Studio) */
+  --bg-primary: #E9ECEF;
+  --bg-secondary: #DEE2E6;
+  --bg-tertiary: #CED4DA;
+  --bg-card: #F8F9FA;
+  --bg-card-inner: #EDF2F7;
+  --bg-canvas: #151D2A;
+  --bg-dark: #0F172A;
   --border-light: #CED4DA;
   --border-focus: #ADB5BD;
-  --border-industrial: #DEE2E6;
-
-  /* Logo Palette Colors */
-  --color-primary: #EB5B28;        /* Naranja corporativo del logo */
-  --color-primary-rgb: 235, 91, 40;
+  --color-primary: #EB5B28;
   --color-primary-hover: #D44B1B;
   --color-primary-light: rgba(235, 91, 40, 0.12);
   --color-primary-border: rgba(235, 91, 40, 0.3);
-
-  --color-secondary: #C84617;      /* Óxido profundo */
-  --color-terracotta: #A53713;     /* Terracota del logo */
-  
-  --color-dark: #0F172A;           /* Antracita / Grafito */
-  --color-steel: #334155;          /* Acero oscuro */
-  --color-success: #16A34A;
-  --color-whatsapp: #25D366;
-  --color-whatsapp-hover: #20BA5A;
-
+  --color-secondary: #C84617;
   --text-main: #1E293B;
   --text-secondary: #334155;
   --text-muted: #64748B;
-  --text-light: #94A3B8;
   --text-white: #FFFFFF;
+  --hero-gradient: linear-gradient(145deg, #1A2333 0%, #0F172A 60%, #151D2A 100%);
+  --hero-tag-color: #FF8A5B;
+  --hero-tag-bg: rgba(235, 91, 40, 0.15);
+  --hero-tag-border: rgba(235, 91, 40, 0.4);
 
-  /* Fonts */
+  /* Shared Properties */
+  --color-success: #16A34A;
+  --color-whatsapp: #25D366;
+  --color-whatsapp-hover: #20BA5A;
   --font-headings: 'Space Grotesk', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;
-
-  /* Transitions & Shadows */
   --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   --shadow-subtle: 0 1px 3px rgba(15, 23, 42, 0.08);
   --shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
-  --shadow-card-hover: 0 16px 36px -4px rgba(15, 23, 42, 0.15), 0 4px 12px -2px rgba(235, 91, 40, 0.15);
-  --shadow-sheet: 0 8px 24px rgba(15, 23, 42, 0.12), 0 2px 8px rgba(15, 23, 42, 0.08);
+  --shadow-card-hover: 0 16px 36px -4px rgba(15, 23, 42, 0.15);
   --shadow-float: 0 10px 30px rgba(0, 0, 0, 0.15);
-
-  /* Layout */
   --max-width: 1240px;
   --header-height: 80px;
   --border-radius: 12px;
   --border-radius-sm: 8px;
   --border-radius-lg: 18px;
+}
+
+/* PALETA 1: Blueprint & Safety Amber (Azul Marino Profundo + Ámbar Seguridad) */
+body.theme-blueprint {
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --bg-tertiary: #334155;
+  --bg-card: #1E293B;
+  --bg-card-inner: #0F172A;
+  --bg-canvas: #090E17;
+  --bg-dark: #0B111E;
+  --border-light: #334155;
+  --border-focus: #475569;
+  --color-primary: #F59E0B;
+  --color-primary-hover: #D97706;
+  --color-primary-light: rgba(245, 158, 11, 0.15);
+  --color-primary-border: rgba(245, 158, 11, 0.4);
+  --color-secondary: #B45309;
+  --text-main: #F8FAFC;
+  --text-secondary: #E2E8F0;
+  --text-muted: #94A3B8;
+  --hero-gradient: linear-gradient(145deg, #0B1528 0%, #060B14 100%);
+  --hero-tag-color: #FBBF24;
+  --hero-tag-bg: rgba(245, 158, 11, 0.18);
+  --hero-tag-border: rgba(245, 158, 11, 0.5);
+}
+
+/* PALETA 2: Slate Steel & Electric Cobalt (Pizarra Acero + Azul Cobalto Eléctrico) */
+body.theme-slate {
+  --bg-primary: #E2E8F0;
+  --bg-secondary: #CBD5E1;
+  --bg-tertiary: #94A3B8;
+  --bg-card: #FFFFFF;
+  --bg-card-inner: #F1F5F9;
+  --bg-canvas: #1E293B;
+  --bg-dark: #0F172A;
+  --border-light: #94A3B8;
+  --border-focus: #64748B;
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-primary-light: rgba(37, 99, 235, 0.12);
+  --color-primary-border: rgba(37, 99, 235, 0.35);
+  --color-secondary: #1E40AF;
+  --text-main: #0F172A;
+  --text-secondary: #1E293B;
+  --text-muted: #475569;
+  --hero-gradient: linear-gradient(145deg, #1E3A8A 0%, #0F172A 70%, #172554 100%);
+  --hero-tag-color: #60A5FA;
+  --hero-tag-bg: rgba(37, 99, 235, 0.2);
+  --hero-tag-border: rgba(96, 165, 250, 0.4);
+}
+
+/* PALETA 3: Foundry & Rust Bronze (Fundición Carbón Oscuro + Naranja Óxido) */
+body.theme-foundry {
+  --bg-primary: #18181B;
+  --bg-secondary: #27272A;
+  --bg-tertiary: #3F3F46;
+  --bg-card: #27272A;
+  --bg-card-inner: #18181B;
+  --bg-canvas: #09090B;
+  --bg-dark: #09090B;
+  --border-light: #3F3F46;
+  --border-focus: #52525B;
+  --color-primary: #EA580C;
+  --color-primary-hover: #C2410C;
+  --color-primary-light: rgba(234, 88, 12, 0.16);
+  --color-primary-border: rgba(234, 88, 12, 0.4);
+  --color-secondary: #9A3412;
+  --text-main: #FAFAFA;
+  --text-secondary: #E4E4E7;
+  --text-muted: #A1A1AA;
+  --hero-gradient: linear-gradient(145deg, #27272A 0%, #09090B 100%);
+  --hero-tag-color: #FB923C;
+  --hero-tag-bg: rgba(234, 88, 12, 0.2);
+  --hero-tag-border: rgba(251, 146, 60, 0.5);
+}
+
+/* PALETA 4: Modern Industrial Titanio Studio (Gris Titanio Cálido + Naranja Oficial) */
+body.theme-titanio {
+  --bg-primary: #E9ECEF;
+  --bg-secondary: #DEE2E6;
+  --bg-tertiary: #CED4DA;
+  --bg-card: #F8F9FA;
+  --bg-card-inner: #EDF2F7;
+  --bg-canvas: #151D2A;
+  --bg-dark: #0F172A;
+  --border-light: #CED4DA;
+  --border-focus: #ADB5BD;
+  --color-primary: #EB5B28;
+  --color-primary-hover: #D44B1B;
+  --color-primary-light: rgba(235, 91, 40, 0.12);
+  --color-primary-border: rgba(235, 91, 40, 0.3);
+  --color-secondary: #C84617;
+  --text-main: #1E293B;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --hero-gradient: linear-gradient(145deg, #1A2333 0%, #0F172A 60%, #151D2A 100%);
+  --hero-tag-color: #FF8A5B;
+  --hero-tag-bg: rgba(235, 91, 40, 0.15);
+  --hero-tag-border: rgba(235, 91, 40, 0.4);
 }
 
 /* Base resets & styles */
@@ -278,8 +364,8 @@ a {
 .hero {
   padding-top: calc(var(--header-height) + 50px);
   padding-bottom: 70px;
-  background: linear-gradient(145deg, #1A2333 0%, #0F172A 60%, #151D2A 100%);
-  border-bottom: 1px solid #334155;
+  background: var(--hero-gradient);
+  border-bottom: 1px solid var(--border-light);
   position: relative;
   overflow: hidden;
   color: #FFFFFF;
@@ -293,7 +379,7 @@ a {
   right: 0;
   bottom: 0;
   background-image: 
-    radial-gradient(circle at 80% 20%, rgba(235, 91, 40, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, var(--color-primary-light) 0%, transparent 50%),
     linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
   background-size: 100% 100%, 30px 30px, 30px 30px;
@@ -312,9 +398,9 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(235, 91, 40, 0.15);
-  border: 1px solid rgba(235, 91, 40, 0.4);
-  color: #FF8A5B;
+  background: var(--hero-tag-bg);
+  border: 1px solid var(--hero-tag-border);
+  color: var(--hero-tag-color);
   padding: 6px 16px;
   border-radius: 30px;
   font-size: 0.82rem;
@@ -334,9 +420,7 @@ a {
 }
 
 .hero h1 span {
-  background: linear-gradient(135deg, #FF7A45 0%, #EB5B28 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-primary);
   position: relative;
 }
 
@@ -1653,3 +1737,197 @@ footer {
   font-family: var(--font-body);
   font-weight: 500;
 }
+
+/* ==========================================================================
+   Interactive Theme / Color Palette Switcher Widget
+   ========================================================================== */
+.palette-switcher-widget {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  font-family: var(--font-body);
+}
+
+.palette-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.9);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 16px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.palette-toggle-btn:hover {
+  transform: translateY(-2px);
+  background: #0F172A;
+  border-color: var(--color-primary);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.palette-toggle-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.palette-menu-card {
+  display: none;
+  background: #FFFFFF;
+  color: #1E293B;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 14px;
+  width: 290px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+  animation: paletteFadeIn 0.2s ease-out forwards;
+}
+
+.palette-switcher-widget.open .palette-menu-card {
+  display: block;
+}
+
+@keyframes paletteFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.palette-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.palette-menu-title {
+  font-family: var(--font-headings);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0F172A;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.palette-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94A3B8;
+  display: flex;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.palette-close-btn:hover {
+  color: #0F172A;
+  background: #F1F5F9;
+}
+
+.palette-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.palette-opt-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1.5px solid #E2E8F0;
+  background: #F8FAFC;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.palette-opt-btn:hover {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+}
+
+.palette-opt-btn.active {
+  border-color: #0F172A;
+  background: #EFF6FF;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.palette-swatches {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.palette-swatch-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.palette-opt-info {
+  flex: 1;
+}
+
+.palette-opt-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0F172A;
+  line-height: 1.2;
+}
+
+.palette-opt-desc {
+  font-size: 0.72rem;
+  color: #64748B;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.palette-check-icon {
+  width: 16px;
+  height: 16px;
+  color: #0F172A;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.palette-opt-btn.active .palette-check-icon {
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .palette-switcher-widget {
+    bottom: 84px;
+    left: 16px;
+  }
+  .palette-menu-card {
+    width: calc(100vw - 32px);
+  }
+}

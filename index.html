@@ -8,7 +8,7 @@
   <meta name="description"
     content="Fabricación de pilares de hormigón premoldeado para acometida aérea y subterránea, gabinetes de distribución normalizados y sistemas de telemedición inteligente.">
   <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' blob: data:; worker-src * 'unsafe-inline' 'unsafe-eval' blob: data:; connect-src * 'unsafe-inline' blob: data:; img-src * data: blob: 'unsafe-inline'; style-src * 'unsafe-inline'; frame-src *;">
-  <link rel="stylesheet" href="style.css?v=2.4">
+  <link rel="stylesheet" href="style.css?v=2.5">
 </head>
 
 <body>
@@ -377,10 +377,85 @@
     </div>
   </footer>
 
+  <!-- Theme & Palette Switcher Tool (Previsualización de Paletas) -->
+  <div class="palette-switcher-widget" id="palette-switcher-widget">
+    <div class="palette-menu-card" id="palette-menu-card">
+      <div class="palette-menu-header">
+        <div class="palette-menu-title">
+          <i data-lucide="palette" style="width: 16px; height: 16px;"></i>
+          Paletas de Color
+        </div>
+        <button class="palette-close-btn" id="palette-close-btn" aria-label="Cerrar selector">
+          <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+        </button>
+      </div>
+      <div class="palette-options">
+        <button class="palette-opt-btn" data-theme="theme-titanio">
+          <div class="palette-swatches">
+            <span class="palette-swatch-dot" style="background: #E9ECEF;"></span>
+            <span class="palette-swatch-dot" style="background: #0F172A;"></span>
+            <span class="palette-swatch-dot" style="background: #EB5B28;"></span>
+          </div>
+          <div class="palette-opt-info">
+            <div class="palette-opt-name">Titanio &amp; Naranja</div>
+            <div class="palette-opt-desc">Platino industrial, grafito y naranja</div>
+          </div>
+          <i data-lucide="check" class="palette-check-icon"></i>
+        </button>
+
+        <button class="palette-opt-btn" data-theme="theme-blueprint">
+          <div class="palette-swatches">
+            <span class="palette-swatch-dot" style="background: #0F172A;"></span>
+            <span class="palette-swatch-dot" style="background: #1E293B;"></span>
+            <span class="palette-swatch-dot" style="background: #F59E0B;"></span>
+          </div>
+          <div class="palette-opt-info">
+            <div class="palette-opt-name">Blueprint &amp; Ámbar</div>
+            <div class="palette-opt-desc">Azul marino de planos con ámbar</div>
+          </div>
+          <i data-lucide="check" class="palette-check-icon"></i>
+        </button>
+
+        <button class="palette-opt-btn" data-theme="theme-slate">
+          <div class="palette-swatches">
+            <span class="palette-swatch-dot" style="background: #E2E8F0;"></span>
+            <span class="palette-swatch-dot" style="background: #0F172A;"></span>
+            <span class="palette-swatch-dot" style="background: #2563EB;"></span>
+          </div>
+          <div class="palette-opt-info">
+            <div class="palette-opt-name">Pizarra &amp; Cobalto</div>
+            <div class="palette-opt-desc">Acero slate con azul eléctrico</div>
+          </div>
+          <i data-lucide="check" class="palette-check-icon"></i>
+        </button>
+
+        <button class="palette-opt-btn" data-theme="theme-foundry">
+          <div class="palette-swatches">
+            <span class="palette-swatch-dot" style="background: #18181B;"></span>
+            <span class="palette-swatch-dot" style="background: #27272A;"></span>
+            <span class="palette-swatch-dot" style="background: #EA580C;"></span>
+          </div>
+          <div class="palette-opt-info">
+            <div class="palette-opt-name">Fundición &amp; Óxido</div>
+            <div class="palette-opt-desc">Carbón oscuro con bronce oxidado</div>
+          </div>
+          <i data-lucide="check" class="palette-check-icon"></i>
+        </button>
+      </div>
+    </div>
+
+    <button class="palette-toggle-btn" id="palette-toggle-btn" title="Probar paletas de colores">
+      <span class="palette-toggle-icon">
+        <i data-lucide="palette"></i>
+      </span>
+      <span>Cambiar Paleta</span>
+    </button>
+  </div>
+
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Application Logic -->
-  <script src="app.js?v=4.2"></script>
+  <script src="app.js?v=4.3"></script>
 </body>
 
 </html>
