@@ -1,0 +1,269 @@
+[
+  {
+    "id": "pam1u",
+    "code": "PAM1U",
+    "name": "Pilar Hormigón Acometida Aérea Monofásica (1 Usuario)",
+    "category": "pilares",
+    "tag": "Acometida Aérea Monofásica",
+    "description": "Pilar de hormigón premoldeado para acometida aérea monofásica a un usuario. Proporciona máxima durabilidad estructural frente a la intemperie y actos vandálicos, cumpliendo especificaciones de distribuidoras.",
+    "specs": [
+      "Dimensiones: 350 mm ancho x 365 mm profundidad",
+      "Altura libre exterior: 1370 mm | Altura medidor: 1035 mm",
+      "Profundidad de empotramiento: 450 mm + 50 mm cama de arena",
+      "Caño de acometida con pipeta superior y rack con aislador",
+      "Caja plástica y tapa de policarbonato para medidor monofásico",
+      "Ventana de inspección y protección usuario en cara posterior"
+    ],
+    "components": [
+      "Módulo de extensión con salida de cables",
+      "Módulo de medición y protección",
+      "Caja plástica y soporte para medidor monofásico",
+      "Tapa de policarbonato de alta resistencia UV",
+      "Caño de acometida con pipeta y rack aislador",
+      "Caja plástica para protección lado Usuario",
+      "Interruptor termomagnético y aro de goma de estanqueidad"
+    ],
+    "image": "assets/catalogo/pilares/pam1u.png",
+    "sheet": "assets/catalogo/pilares/pam1u-ficha.png",
+    "plan": "Plano PAM1U (Versión 28/01/19)"
+  },
+  {
+    "id": "pam2u",
+    "code": "PAM2U",
+    "name": "Pilar Hormigón Acometida Aérea Monofásica (2 Usuarios)",
+    "category": "pilares",
+    "tag": "Acometida Aérea Monofásica Doble",
+    "description": "Solución compacta de hormigón premoldeado para dos suministros monofásicos independientes con acometida aérea compartida y gabinetes independientes de lectura.",
+    "specs": [
+      "Dimensiones: 350 mm ancho x 365 mm profundidad",
+      "Altura libre exterior: 1370 mm",
+      "Doble alojamiento para medidores monofásicos (alturas 710 y 1035 mm)",
+      "Profundidad de empotramiento: 450 mm con salida lado usuario",
+      "Caño con rack y aislador para doble servicio",
+      "Dos cajas posteriores de protección termomagnética individuales"
+    ],
+    "components": [
+      "Módulo de extensión con salida de cables",
+      "Módulo de medición y protección doble",
+      "2 Cajas plásticas y soportes para medidores",
+      "2 Tapas de policarbonato con visor de lectura",
+      "Caño de acometida aérea reforzado con pipeta",
+      "2 Cajas de protección usuario independientes",
+      "2 Interruptores termomagnéticos normalizados"
+    ],
+    "image": "assets/catalogo/pilares/pam2u.png",
+    "sheet": "assets/catalogo/pilares/pam2u-ficha.png",
+    "plan": "Plano PAM2U (Versión 28/01/19)"
+  },
+  {
+    "id": "pat1u",
+    "code": "PAT1U",
+    "name": "Pilar Hormigón Acometida Aérea Trifásica (1 Usuario)",
+    "category": "pilares",
+    "tag": "Acometida Aérea Trifásica",
+    "description": "Estructura premoldeada de alta resistencia mecánica para suministros trifásicos comerciales o residenciales de alta demanda con alimentación aérea.",
+    "specs": [
+      "Dimensiones: 350 mm ancho x 365 mm profundidad",
+      "Altura libre exterior: 1370 mm | Altura de medición: 930 mm",
+      "Empotramiento: 450 mm sobre lecho de arena nivelado",
+      "Acometida aérea de 4 conductores con caño y pipeta estanca",
+      "Gabinete para medidor trifásico de medición directa",
+      "Caja posterior usuario para protección termomagnética tetrapolar"
+    ],
+    "components": [
+      "Módulo base y extensión con ventana para cables",
+      "Módulo de medición y protección trifásica",
+      "Caja plástica para medidor trifásico",
+      "Soporte interior y tapa de policarbonato precintable",
+      "Caño de acometida con pipeta y rack aislador",
+      "Caja plástica y llave termomagnética usuario"
+    ],
+    "image": "assets/catalogo/pilares/pat1u.png",
+    "sheet": "assets/catalogo/pilares/pat1u-ficha.png",
+    "plan": "Plano PAT1U (Versión 28/01/19)"
+  },
+  {
+    "id": "pst1u",
+    "code": "PST1U",
+    "name": "Pilar Hormigón Acometida Subterránea Trifásica (1 Usuario)",
+    "category": "pilares",
+    "tag": "Acometida Subterránea Trifásica",
+    "description": "Pilar premoldeado diseñado específicamente para redes subterráneas. Incluye caja de toma de 60A integrada y compartimento de medición trifásica con accesos independientes.",
+    "specs": [
+      "Dimensiones: 300 mm frente x 365 mm profundidad",
+      "Altura exterior sobre terreno: 1300 mm",
+      "Enterramiento: 625 mm para vinculación directa de zanjas subterráneas",
+      "Caja de toma 60A con protección de fusibles",
+      "Ventana frontal de entrada distribuidora y ventana posterior usuario",
+      "Alojamiento superior para medidor trifásico y opcional señales débiles"
+    ],
+    "components": [
+      "Módulo de extensión con entrada y salida de cables",
+      "Módulo de medición y protección",
+      "Caja de toma seccionable de 60 A",
+      "Caja plástica y soporte para medidor trifásico",
+      "Tapa de policarbonato transparente para lectura",
+      "Caja plástica para protección térmica/diferencial usuario",
+      "Caja opcional para telefonía / señales débiles"
+    ],
+    "image": "assets/catalogo/pilares/pst1u.png",
+    "sheet": "assets/catalogo/pilares/pst1u-ficha.png",
+    "plan": "Plano PST1U (Versión 29/01/19)"
+  },
+  {
+    "id": "pst2u",
+    "code": "PST2U",
+    "name": "Pilar Hormigón Acometida Subterránea Trifásica (2 Usuarios)",
+    "category": "pilares",
+    "tag": "Acometida Subterránea Trifásica Doble",
+    "description": "Gabinete premoldeado modular de doble ancho (700 mm) con envolvente interior para barras de distribución y derivación de protecciones para dos usuarios trifásicos en redes subterráneas.",
+    "specs": [
+      "Dimensiones: 700 mm frente x 405 mm profundidad",
+      "Altura exterior libre: 1650 mm | Enterramiento: 800 mm",
+      "Base y ducto de acometida con ventanas para cables subterráneos",
+      "Ducto de extensión y caja para barras distribuidora",
+      "2 Cajas para medidor trifásico montadas en paralelo",
+      "2 Cajas usuario traseras + 2 cajas para señales débiles"
+    ],
+    "components": [
+      "Base y ducto de acometida subterránea de alta resistencia",
+      "Ducto de extensión y envolvente de barras lado distribuidora",
+      "Envolvente de cajas para medición y protección lado usuario",
+      "2 Cajas plásticas y soportes para medidores trifásicos",
+      "2 Tapas frontales de policarbonato con visor",
+      "Caja plástica para barras y protecciones distribuidora",
+      "2 Cajas plásticas para protecciones lado usuario y señales"
+    ],
+    "image": "assets/catalogo/pilares/pst2u.png",
+    "sheet": "assets/catalogo/pilares/pst2u-ficha.png",
+    "plan": "Plano PST2U (Versión 26/01/17)"
+  },
+  {
+    "id": "caja-barras",
+    "code": "CBP-DIST",
+    "name": "Caja Plástica para Barras y Protecciones Distribuidora",
+    "category": "pilares",
+    "tag": "Gabinete y Barras de Distribución",
+    "description": "Caja construida en material plástico de 4 mm de espesor mínimo con juego de barras conductoras normalizadas de cobre o aluminio (30x5 mm), aisladores escalonados y fijaciones de seguridad.",
+    "specs": [
+      "Dimensiones: 555 mm ancho x 680 mm alto x 217 mm fondo",
+      "Material: Plástico técnico ignífugo con protección UV (espesor ≥ 4 mm)",
+      "Barras colectoras de cobre o aluminio de 30 x 5 mm",
+      "Aisladores escalonados de alta rigidez para montaje seguro",
+      "Preparado para fijación interior en pilares premoldeados PST2U"
+    ],
+    "components": [
+      "Caja plástica estanca con pestaña perimetral",
+      "Aisladores escalonados portabarras de alta tensión",
+      "Juego de barras conductoras mecanizadas",
+      "Tornillería en acero bicromatado / inoxidable"
+    ],
+    "image": "assets/catalogo/pilares/caja-barras.png",
+    "sheet": "assets/catalogo/pilares/caja-barras-ficha.png",
+    "plan": "Plano Caja Barras (Versión 08/11/16)"
+  },
+  {
+    "id": "caja-seccionadores",
+    "code": "CSF-160",
+    "name": "Caja Plástica con Seccionadores Fusible y Bornera",
+    "category": "pilares",
+    "tag": "Seccionamiento y Protección MT/BT",
+    "description": "Gabinete de maniobra y corte en carga equipado con dos seccionadores fusible de 160 A y bornera de interconexión multipolar de 100 A montados sobre placa metálica con pantalla protectora.",
+    "specs": [
+      "Dimensiones: 555 mm ancho x 680 mm alto x 217 mm fondo",
+      "2 Seccionadores fusibles en carga de 160 A",
+      "Bornera de conexión tipo T4-100 para hasta 100 A",
+      "Placa metálica galvanizada de soporte y fijación",
+      "Protección acrílica contra contactos accidentales directos"
+    ],
+    "components": [
+      "Caja plástica de alta rigidez dieléctrica",
+      "Placa metálica galvanizada para montajes de potencia",
+      "2 Seccionadores fusible de 160 A de maniobra rápida",
+      "Bornera 100 A con bornes aislados",
+      "Pantalla transparente de protección para operarios"
+    ],
+    "image": "assets/catalogo/pilares/caja-seccionadores.png",
+    "sheet": "assets/catalogo/pilares/caja-seccionadores-ficha.png",
+    "plan": "Plano Caja Seccionadores (Versión 10/11/20)"
+  },
+  {
+    "id": "pst2u-ct",
+    "code": "PST2U-CT",
+    "name": "Pilar Trifásico Subterráneo 2 Usuarios con Caja Técnica",
+    "category": "pilares",
+    "tag": "Acometida Subterránea con Caja Técnica",
+    "description": "Variante de gran capacidad equipada con una caja técnica subterránea de 1265 mm para acometidas complejas, transiciones de red subterránea y distribución simultánea a 2 suministros trifásicos.",
+    "specs": [
+      "Dimensiones torre: 700x405x1650 mm | Base técnica: 1265 mm ancho",
+      "Enterramiento total: 800 mm sobre base compactada",
+      "Caja técnica inferior espaciosa para radio de curvatura de cables",
+      "Doble alojamiento trifásico con visor independiente",
+      "Envolvente interna para barras de distribuidora y protecciones de usuario"
+    ],
+    "components": [
+      "Caja técnica inferior reforzada de 1265 mm",
+      "Ducto de extensión y envolvente de barras distribuidora",
+      "Envolvente de medición y protección lado usuario",
+      "2 Cajas para medidor trifásico + soportes y tapas policarbonato",
+      "Caja plástica de barras distribuidora",
+      "2 Cajas para protección usuario + 2 cajas señales débiles"
+    ],
+    "image": "assets/catalogo/pilares/pst2u-ct.png",
+    "sheet": "assets/catalogo/pilares/pst2u-ct-ficha.png",
+    "plan": "Plano PST2U-CT (Versión 22/02/18)"
+  },
+  {
+    "id": "pst2u-1",
+    "code": "PST2U-1",
+    "name": "Pilar Hormigón Subterráneo Trifásico 2 Usuarios (PST2U-1)",
+    "category": "pilares",
+    "tag": "Acometida Subterránea Trifásica Compacta",
+    "description": "Diseño racionalizado y compacto de 600 mm de frente con acometida subterránea, 2 cajas toma con 6 bases NH-00, bornera de neutro, 4 módulos para térmicas y diferenciales.",
+    "specs": [
+      "Dimensiones: 600 mm frente x 315 mm fondo x 1300 mm altura exterior",
+      "Enterramiento: 760 mm con base y ducto de acometida",
+      "2 Cajas toma con 6 Bases portafusibles tamaño NH-00",
+      "2 Borneras de neutro y tubos de acometida plásticos",
+      "4 Cajas de protecciones termomagnéticas y diferenciales",
+      "Caja plástica auxiliar para señales débiles y 5 cuplas plásticas"
+    ],
+    "components": [
+      "Base y ducto de acometida + ducto de extensión",
+      "Envolvente de cajas para medición y protección",
+      "2 Cajas toma + 6 Bases NH-00 para fusibles de alto poder de ruptura",
+      "2 Borneras de neutro + tubos plásticos de acometida",
+      "2 Cajas plásticas para medidor trifásico y tapas de policarbonato",
+      "4 Cajas plásticas para llaves termomagnéticas y diferenciales",
+      "Caja para señales débiles + 5 cuplas plásticas"
+    ],
+    "image": "assets/catalogo/pilares/pst2u-1.png",
+    "sheet": "assets/catalogo/pilares/pst2u-1-ficha.png",
+    "plan": "Plano PST2U-1 (Diseño 30/03/22)"
+  },
+  {
+    "id": "set-630kva",
+    "code": "SET-630",
+    "name": "Subestación Transformadora a Nivel de hasta 630 kVA",
+    "category": "pilares",
+    "tag": "Subestación Monolítica MT/BT",
+    "description": "Centro de transformación a nivel en cabina monolítica de hormigón armado premoldeado de 80 mm de espesor. Diseñada para alojar celdas de MT, transformador de distribución de hasta 630 kVA y cuadro de BT.",
+    "specs": [
+      "Dimensiones exteriores: 3840 mm longitud x 2760 mm ancho x 2680 mm altura",
+      "Paredes y losa superior de hormigón armado de 80 mm de espesor",
+      "Compartimentos segregados: Media Tensión (con reserva), Trafo y Baja Tensión",
+      "Ventilación natural reforzada mediante celosías perimetrales laberínticas",
+      "Fosa colectora y accesos amplios para mantenimiento y maniobra"
+    ],
+    "components": [
+      "Estructura premoldeada monolítica sismorresistente",
+      "Alojamiento para celda MT compacta con espacio de reserva",
+      "Recinto para transformador trifásico MT/BT hasta 630 kVA",
+      "Espacio para tablero general de distribución en baja tensión (TGBT)",
+      "Puertas metálicas reforzadas, celosías de ventilación y puesta a tierra"
+    ],
+    "image": "assets/catalogo/pilares/set-630kva.png",
+    "sheet": "assets/catalogo/pilares/set-630kva-ficha.png",
+    "plan": "Plano Subestación Transformadora a Nivel (Versión 20/02/16)"
+  }
+]

@@ -4,27 +4,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Electroductos de Argentina | Infraestructura Eléctrica y Telemedición</title>
+  <title>Electroductos de Argentina S.A. | Pilares Premoldeados e Infraestructura Eléctrica</title>
   <meta name="description"
-    content="Soluciones avanzadas en componentes eléctricos, pilares, subestaciones y sistemas inteligentes de telemedición.">
+    content="Fabricación de pilares de hormigón premoldeado para acometida aérea y subterránea, gabinetes de distribución normalizados y sistemas de telemedición inteligente.">
   <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' blob: data:; worker-src * 'unsafe-inline' 'unsafe-eval' blob: data:; connect-src * 'unsafe-inline' blob: data:; img-src * data: blob: 'unsafe-inline'; style-src * 'unsafe-inline'; frame-src *;">
-  <link rel="stylesheet" href="style.css?v=1.7">
+  <link rel="stylesheet" href="style.css?v=2.0">
 </head>
 
 <body>
-
-  <!-- Background Decorative Glowing Orbs -->
-  <div class="glow-orb orb-1"></div>
-  <div class="glow-orb orb-2"></div>
 
   <!-- Header Navigation -->
   <header id="site-header">
     <div class="nav-container">
       <a href="#inicio" class="logo" id="logo-link">
-        <img src="assets/logo.png" alt="Electroductos de Argentina" class="logo-img">
+        <img src="assets/logo.png" alt="Electroductos de Argentina S.A." class="logo-img">
         <div class="logo-text">
           <div class="logo-title">ELECTRO<span>DUCTOS</span></div>
-          <div class="logo-subtext">de Argentina</div>
+          <div class="logo-subtext">de Argentina S.A.</div>
         </div>
       </a>
 
@@ -33,17 +29,16 @@
       </button>
 
       <ul class="nav-menu" id="nav-links">
-        <li class="nav-item active" data-target="all"><a href="#catalogo">Catálogo</a></li>
-        <li class="nav-item" data-target="componentes"><a href="#catalogo">Componentes</a></li>
-        <li class="nav-item" data-target="pilares"><a href="#catalogo">Pilares</a></li>
-        <li class="nav-item" data-target="subestaciones"><a href="#catalogo">Subestaciones</a></li>
+        <li class="nav-item active" data-target="inicio"><a href="#inicio">Inicio</a></li>
+        <li class="nav-item" data-target="productos"><a href="#productos">Productos</a></li>
         <li class="nav-item" data-target="telemedicion"><a href="#telemedicion">Telemedición</a></li>
+        <li class="nav-item" data-target="contacto"><a href="#contacto">Contacto</a></li>
         <!-- Clerk Auth Controls -->
         <li class="nav-item" id="auth-nav-item"
           style="display: flex; align-items: center; gap: 10px; padding-left: 10px;">
           <div id="clerk-user-button" style="display: none;"></div>
           <button class="btn btn-secondary" id="clerk-login-btn"
-            style="padding: 8px 16px; font-size: 0.85rem; border-radius: 20px; display: none;">Ingresar</button>
+            style="padding: 7px 16px; font-size: 0.85rem; border-radius: 6px; display: none;">Ingresar</button>
         </li>
       </ul>
     </div>
@@ -58,61 +53,118 @@
   <section class="hero" id="inicio">
     <div class="hero-content">
       <div class="hero-tag">
-        <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i> Tecnologías Eléctricas de Vanguardia
+        <i data-lucide="shield-check" style="width: 15px; height: 15px;"></i> Calidad Certificada &bull; Normas Técnicas Oficiales
       </div>
-      <h1>Sistemas de Infraestructura y <span>Telemedición Inteligente</span></h1>
+      <h1>Pilares Premoldeados de Hormigón &amp; <span>Infraestructura Eléctrica</span></h1>
       <p class="hero-description">
-        Proveemos soluciones robustas para redes eléctricas de distribución y transmisión, combinando ingeniería
-        avanzada y sistemas de telemedición en tiempo real.
+        Ingeniería y fabricación de pilares premoldeados para acometidas aéreas y subterráneas, gabinetes de distribución y soluciones de telemedición con los más altos estándares de seguridad y durabilidad.
       </p>
       <div class="hero-cta">
-        <a href="#catalogo" class="btn btn-primary" id="hero-btn-catalog">
-          Explorar Productos <i data-lucide="arrow-right"></i>
+        <a href="#productos" class="btn btn-primary" id="hero-btn-catalog">
+          <i data-lucide="layout-grid" style="width: 18px; height: 18px;"></i> Ver Catálogo de Pilares
         </a>
-        <a href="#telemedicion" class="btn btn-secondary" id="hero-btn-telemetry">
-          Ver Telemedición <i data-lucide="activity"></i>
+        <a href="assets/catalogo/catalogo-electroductos.pdf" download="Catalogo-Electroductos-de-Argentina.pdf" class="btn btn-secondary" id="hero-btn-download">
+          <i data-lucide="file-down" style="width: 18px; height: 18px; color: var(--color-primary);"></i> Descargar Catálogo Completo (PDF)
         </a>
+      </div>
+
+      <!-- Quick Specs Row -->
+      <div class="hero-specs-row">
+        <div class="hero-spec-item">
+          <div class="hero-spec-icon">
+            <i data-lucide="award"></i>
+          </div>
+          <div class="hero-spec-info">
+            <h4>Hormigón Premoldeado</h4>
+            <p>Estructuras reforzadas antivandálicas</p>
+          </div>
+        </div>
+        <div class="hero-spec-item">
+          <div class="hero-spec-icon">
+            <i data-lucide="zap"></i>
+          </div>
+          <div class="hero-spec-info">
+            <h4>Monofásicos y Trifásicos</h4>
+            <p>Acometida aérea y subterránea (1 y 2 usuarios)</p>
+          </div>
+        </div>
+        <div class="hero-spec-item">
+          <div class="hero-spec-icon">
+            <i data-lucide="check-circle-2"></i>
+          </div>
+          <div class="hero-spec-info">
+            <h4>Planos Homologados</h4>
+            <p>Conforme especificaciones distribuidoras</p>
+          </div>
+        </div>
+        <div class="hero-spec-item">
+          <div class="hero-spec-icon">
+            <i data-lucide="activity"></i>
+          </div>
+          <div class="hero-spec-info">
+            <h4>Telemedición IoT</h4>
+            <p>Monitoreo inteligente para cooperativas</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Main Content Area -->
   <main>
-    <!-- Catalog Section -->
-    <section id="catalogo">
-      <h2 class="section-title" id="catalog-heading">Catálogo de Productos</h2>
-      <p class="section-subtitle">Filtre por categoría para ver nuestra gama de soluciones eléctricas certificadas.</p>
+    <!-- Section Productos (Pilares y Gabinetes Normalizados) -->
+    <section id="productos">
+      <div class="section-header-wrap">
+        <div>
+          <h2 class="section-title">Pilares y Gabinetes Normalizados</h2>
+          <p class="section-subtitle">
+            Catálogo técnico oficial de pilares de hormigón premoldeado, gabinetes de distribución y centros de transformación.
+          </p>
+        </div>
+        <a href="assets/catalogo/catalogo-electroductos.pdf" download="Catalogo-Electroductos-de-Argentina.pdf" class="btn-download-catalog">
+          <i data-lucide="download" style="width: 18px; height: 18px;"></i> Descargar Catálogo PDF
+        </a>
+      </div>
 
-      <!-- Category Tabs Selector -->
-      <div class="catalog-tabs" id="catalog-category-tabs">
-        <button class="tab-btn active" data-category="all">
-          <i data-lucide="grid"></i> Todos
-        </button>
-        <button class="tab-btn" data-category="componentes">
-          <i data-lucide="cpu"></i> Componentes Eléctricos
-        </button>
-        <button class="tab-btn" data-category="pilares">
-          <i data-lucide="columns"></i> Pilares
-        </button>
-        <button class="tab-btn" data-category="subestaciones">
-          <i data-lucide="box"></i> Subestaciones
-        </button>
-        <button class="tab-btn" data-category="telemedicion">
-          <i data-lucide="activity"></i> Telemedición
-        </button>
+      <!-- Catalog Toolbar & Fast Subfilters -->
+      <div class="catalog-toolbar">
+        <div class="catalog-filters" id="catalog-filters">
+          <button class="filter-btn active" data-filter="all">
+            <i data-lucide="grid"></i> Todos los Modelos (<span id="count-all">10</span>)
+          </button>
+          <button class="filter-btn" data-filter="aerea">
+            <i data-lucide="cloud"></i> Acometida Aérea
+          </button>
+          <button class="filter-btn" data-filter="subterranea">
+            <i data-lucide="layers"></i> Acometida Subterránea
+          </button>
+          <button class="filter-btn" data-filter="cajas">
+            <i data-lucide="box"></i> Cajas y Gabinetes
+          </button>
+        </div>
+        <div class="catalog-download-box">
+          <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 500;">
+            <i data-lucide="file-check" style="width: 14px; height: 14px; vertical-align: middle; color: var(--color-primary);"></i> Catálogo V2 Oficial (10 Páginas)
+          </span>
+        </div>
       </div>
 
       <!-- Products Grid -->
       <div class="catalog-grid" id="products-display-grid">
-        <!-- Dynamically loaded via Javascript -->
+        <!-- Renderizado dinámicamente con app.js -->
       </div>
     </section>
 
     <!-- Telemedición Section (Cooperatives & Embedded Panel) -->
     <section id="telemedicion" class="coop-section">
-      <h2 class="section-title">Servicio de Telemedición</h2>
-      <p class="section-subtitle" id="telemetry-subtitle">Seleccione una cooperativa para visualizar el panel de control
-        y mediciones en tiempo real.</p>
+      <div class="section-header-wrap">
+        <div>
+          <h2 class="section-title">Servicio de Telemedición</h2>
+          <p class="section-subtitle" id="telemetry-subtitle">
+            Seleccione una cooperativa para visualizar el panel de control y mediciones en tiempo real.
+          </p>
+        </div>
+      </div>
 
       <!-- Admin Organization Controls -->
       <div id="clerk-admin-controls" style="display: none; text-align: center; margin-bottom: 30px;">
@@ -123,11 +175,11 @@
 
       <!-- Organization Profile Modal Window (Hidden by default) -->
       <div id="clerk-org-profile-modal"
-        style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 11, 25, 0.85); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; overflow-y: auto; padding: 40px 20px;">
+        style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; overflow-y: auto; padding: 40px 20px;">
         <div
-          style="position: relative; width: 100%; max-width: 900px; background: var(--bg-secondary); border: 1px solid var(--border-glass); border-radius: var(--border-radius); box-shadow: var(--shadow-card); padding: 20px;">
+          style="position: relative; width: 100%; max-width: 900px; background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--border-radius); box-shadow: var(--shadow-float); padding: 24px;">
           <button id="close-org-profile-modal-btn"
-            style="position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-glass); color: var(--text-main); padding: 8px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: bold; z-index: 10;">
+            style="position: absolute; top: 20px; right: 20px; background: var(--bg-secondary); border: 1px solid var(--border-light); color: var(--text-main); padding: 8px 14px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 700; z-index: 10;">
             <i data-lucide="x" style="width: 16px; height: 16px;"></i> Cerrar Gestión
           </button>
           <div id="clerk-org-profile-container" style="margin-top: 40px; display: flex; justify-content: center;"></div>
@@ -136,25 +188,50 @@
 
       <!-- Unauthenticated Prompt Container -->
       <div id="clerk-auth-required-panel"
-        style="display: none; text-align: center; max-width: 500px; margin: 40px auto; padding: 40px 24px; background: var(--bg-secondary); border: 1px solid var(--border-glass); border-radius: var(--border-radius); box-shadow: var(--shadow-card);">
+        style="display: none; text-align: center; max-width: 500px; margin: 40px auto; padding: 40px 24px; background: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--border-radius); box-shadow: var(--shadow-card);">
         <div
-          style="width: 70px; height: 70px; border-radius: 50%; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.15); display: flex; align-items: center; justify-content: center; color: var(--color-primary); margin: 0 auto 24px auto;">
-          <i data-lucide="lock" style="width: 32px; height: 32px;"></i>
+          style="width: 64px; height: 64px; border-radius: 50%; background: var(--color-primary-light); border: 1px solid var(--color-primary-border); display: flex; align-items: center; justify-content: center; color: var(--color-primary); margin: 0 auto 20px auto;">
+          <i data-lucide="lock" style="width: 28px; height: 28px;"></i>
         </div>
-        <h3 style="font-size: 1.5rem; margin-bottom: 12px; font-family: var(--font-headings);">Acceso Restringido</h3>
-        <p style="color: var(--text-muted); margin-bottom: 24px;">Debes iniciar sesión con tu cuenta autorizada para
-          acceder a la visualización de paneles y telemetría de cooperativas.</p>
+        <h3 style="font-size: 1.4rem; margin-bottom: 12px; color: var(--color-dark);">Acceso Restringido</h3>
+        <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem;">
+          Inicie sesión con su cuenta autorizada para acceder a la visualización de paneles y telemetría de su cooperativa.
+        </p>
         <button class="btn btn-primary" id="clerk-telemetry-login-btn">
           Iniciar Sesión <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
         </button>
       </div>
 
       <!-- Cooperatives Cards Grid (Renderizado dinámicamente desde Clerk) -->
-      <div class="coop-grid" id="cooperatives-display-grid">
-        <!-- Renderizado dinámicamente según las organizaciones asignadas al usuario -->
-      </div>
+      <div class="coop-grid" id="cooperatives-display-grid"></div>
     </section>
   </main>
+
+  <!-- Technical Sheet Fullscreen Modal -->
+  <div class="technical-modal" id="technical-sheet-modal">
+    <div class="modal-content-wrap">
+      <div class="modal-header">
+        <div class="modal-header-titles">
+          <h3 id="modal-product-title">Plano Técnico Normalizado</h3>
+          <p id="modal-product-subtitle">Especificaciones oficiales y plano constructivo</p>
+        </div>
+        <button class="modal-close-btn" id="close-tech-modal" aria-label="Cerrar plano">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img id="modal-product-img" src="" alt="Ficha técnica del producto" class="modal-image-preview">
+      </div>
+      <div class="modal-footer">
+        <a id="modal-download-link" href="" download="" class="btn btn-secondary" style="font-size: 0.85rem; padding: 8px 16px;">
+          <i data-lucide="download" style="width: 16px; height: 16px;"></i> Descargar Imagen del Plano
+        </a>
+        <button class="btn btn-primary" id="modal-whatsapp-inquire" style="font-size: 0.85rem; padding: 8px 18px;">
+          <i data-lucide="message-circle" style="width: 16px; height: 16px;"></i> Consultar por este Producto
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Embedded Fullscreen Iframe Telemetry Viewer -->
   <div class="iframe-container" id="telemetry-panel">
@@ -178,50 +255,114 @@
     </div>
   </div>
 
+  <!-- Floating WhatsApp Widget -->
+  <div class="whatsapp-widget" id="whatsapp-widget">
+    <!-- Chat Popup Window -->
+    <div class="whatsapp-chat-box" id="whatsapp-chat-box">
+      <div class="whatsapp-chat-header">
+        <div class="whatsapp-header-user">
+          <img src="assets/logo.png" alt="Electroductos de Argentina" class="whatsapp-avatar">
+          <div class="whatsapp-user-info">
+            <h4>Electroductos de Argentina S.A.</h4>
+            <span>En línea &bull; Asesoría Técnica</span>
+          </div>
+        </div>
+        <button class="whatsapp-close-chat" id="whatsapp-close-btn" aria-label="Cerrar chat">
+          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+      <div class="whatsapp-chat-body">
+        <div class="whatsapp-msg-bubble">
+          ¡Hola! Bienvenido a Electroductos de Argentina. ¿En qué modelo de pilar o solución eléctrica te podemos asesorar?
+          <div class="whatsapp-msg-time" id="chat-current-time">Ahora</div>
+        </div>
+      </div>
+      <div class="whatsapp-chat-footer">
+        <textarea id="whatsapp-input-text" class="whatsapp-quick-msg" rows="2" placeholder="Escribe tu consulta aquí..."></textarea>
+        <button class="btn-send-whatsapp" id="whatsapp-send-btn">
+          Iniciar Chat en WhatsApp <i data-lucide="send" style="width: 16px; height: 16px;"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Floating Button -->
+    <button class="whatsapp-float-btn" id="whatsapp-toggle-btn" aria-label="Contactar por WhatsApp">
+      <div class="whatsapp-pulse"></div>
+      <span class="whatsapp-online-dot"></span>
+      <i data-lucide="message-circle" style="width: 32px; height: 32px;"></i>
+      <span class="whatsapp-tooltip">¿Consultas técnicas? Escríbenos</span>
+    </button>
+  </div>
+
   <!-- Footer Section -->
-  <footer>
+  <footer id="contacto">
     <div class="footer-container">
       <div class="footer-brand">
         <a href="#inicio" class="logo">
-          <img src="assets/logo.png" alt="Electroductos de Argentina" class="logo-img">
+          <img src="assets/logo.png" alt="Electroductos de Argentina S.A." class="logo-img">
           <div class="logo-text">
             <div class="logo-title">ELECTRO<span>DUCTOS</span></div>
-            <div class="logo-subtext">de Argentina</div>
+            <div class="logo-subtext">de Argentina S.A.</div>
           </div>
         </a>
-        <p>Expertos en el desarrollo de infraestructura de distribución eléctrica inteligente, telemedición y energías
-          eficientes.</p>
+        <p>
+          Fabricación de estructuras y pilares de hormigón premoldeado, gabinetes de distribución y soluciones de telemedición inteligente para cooperativas y empresas eléctricas.
+        </p>
       </div>
 
       <div class="footer-links">
         <h4>Productos</h4>
         <ul>
-          <li><a href="#catalogo" onclick="window.filterCategory('componentes')">Componentes Eléctricos</a></li>
-          <li><a href="#catalogo" onclick="window.filterCategory('pilares')">Pilares Tipo A, B, C</a></li>
-          <li><a href="#catalogo" onclick="window.filterCategory('subestaciones')">Subestaciones</a></li>
+          <li><a href="#productos" onclick="window.filterByGroup('aerea')">Pilares Acometida Aérea</a></li>
+          <li><a href="#productos" onclick="window.filterByGroup('subterranea')">Pilares Acometida Subterránea</a></li>
+          <li><a href="#productos" onclick="window.filterByGroup('cajas')">Cajas y Gabinetes Distribución</a></li>
+          <li><a href="assets/catalogo/catalogo-electroductos.pdf" download="Catalogo-Electroductos-de-Argentina.pdf">Descargar Catálogo (PDF)</a></li>
         </ul>
       </div>
 
       <div class="footer-links">
-        <h4>Empresa</h4>
+        <h4>Navegación</h4>
         <ul>
           <li><a href="#inicio">Inicio</a></li>
-          <li><a href="#telemedicion" onclick="window.filterCategory('telemedicion')">Telemedición</a></li>
-          <li><a href="#inicio">Contacto</a></li>
+          <li><a href="#productos">Productos</a></li>
+          <li><a href="#telemedicion">Telemedición</a></li>
+          <li><a href="#contacto">Contacto</a></li>
         </ul>
+      </div>
+
+      <div class="footer-links">
+        <h4>Contacto &amp; Planta</h4>
+        <div class="footer-contact-item">
+          <i data-lucide="map-pin"></i>
+          <span>Av. Perón 52, X5151CDN<br>La Calera, Córdoba, Argentina</span>
+        </div>
+        <div class="footer-contact-item">
+          <i data-lucide="phone"></i>
+          <span>Tel: 03543-466668</span>
+        </div>
+        <div class="footer-contact-item">
+          <i data-lucide="message-circle"></i>
+          <a href="https://wa.me/5493516336043?text=Hola,%20me%20comunico%20desde%20el%20sitio%20web" target="_blank" rel="noopener noreferrer" style="color: #25D366; font-weight: 600;">
+            WhatsApp: +54 9 3516 33-6043
+          </a>
+        </div>
+        <div class="footer-contact-item">
+          <i data-lucide="mail"></i>
+          <a href="mailto:electroductosdeargentina@gmail.com">electroductosdeargentina@gmail.com</a>
+        </div>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <p>&copy; 2026 Electroductos de Argentina. Todos los derechos reservados.</p>
-      <p>Diseño e Ingeniería de Redes Inteligentes</p>
+      <p>&copy; 2026 Electroductos de Argentina S.A. Todos los derechos reservados.</p>
+      <p>Diseño e Ingeniería de Redes Eléctricas Inteligentes</p>
     </div>
   </footer>
 
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Application Logic -->
-  <script src="app.js?v=3.6"></script>
+  <script src="app.js?v=4.0"></script>
 </body>
 
 </html>
